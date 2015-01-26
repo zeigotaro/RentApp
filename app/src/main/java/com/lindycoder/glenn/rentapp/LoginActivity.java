@@ -6,6 +6,7 @@ import android.annotation.TargetApi;
 
 import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
+import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.net.Uri;
@@ -67,6 +68,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     //private View mEmailLoginFormView;
     //private View mSignOutButtons;
     private View mLoginFormView;
+    public final static String API_TOKEN = "com.lindycoder.glenn.rentapp.MESSAGE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,7 +171,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
     private boolean isPasswordValid(String password) {
         //TODO: Replace this with your own logic
-        return password.length() > 4;
+        return password.length() > 3;
     }
 
     /**
@@ -263,6 +265,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mEmailView.setAdapter(adapter);
     }
 
+    private void onLoginSuccess(String apiToken)
+    {
+        Intent intent = new Intent(this, AccountMainActivity.class);
+        intent.putExtra(API_TOKEN, apiToken);
+        startActivity(intent);
+    }
+
+
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
@@ -281,7 +291,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         protected Boolean doInBackground(Void... params) {
             // TODO: attempt authentication against a network service.
             HttpClient client = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost(getString(R.string.http_post_url));
+            HttpPost httpPost = new HttpPost(getString(R.string.http_login_post_url));
             // Building post parameters, key and value pair
             List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(2);
             nameValuePair.add(new BasicNameValuePair("Email", mEmail));
@@ -292,17 +302,17 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                 HttpResponse response = client.execute(httpPost);
                 HttpEntity resEntity = response.getEntity();
                 if (resEntity != null) {
-                    String retSrc = EntityUtils.toString(resEntity);
-                    JSONObject result = new JSONObject(retSrc);
+                    JSONObject result = new JSONObject(EntityUtils.toString(resEntity));
                     String resultCode = result.getString(getString(R.string.result_param_name));
                     String resultMsg = result.getString(getString(R.string.message_param_name));
-                    if ((resultCode != null) && resultCode.equals(getString(R.string.login_success)))
+                    Log.i("RESULT_CODE", resultCode);
+                    Log.i("RESULT_MSG", resultMsg);
+                    if ((resultCode != null) && resultCode.equals(getString(R.string.post_success)))
                     {
                         String token = result.getString(getString(R.string.token_param_name));
                         Log.i("TOKEN", token);
+                        onLoginSuccess(token);
                     }
-                    Log.i("RESULT_CODE", resultCode);
-                    Log.i("RESULT_MSG", resultMsg);
                 }
             } catch (IOException | JSONException e) {
                 // write exception to log
