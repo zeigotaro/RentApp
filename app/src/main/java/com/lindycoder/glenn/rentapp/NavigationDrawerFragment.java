@@ -1,5 +1,7 @@
 package com.lindycoder.glenn.rentapp;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
 import android.support.v7.app.ActionBar;
@@ -102,9 +104,11 @@ public class NavigationDrawerFragment extends Fragment {
                 android.R.layout.simple_list_item_activated_1,
                 android.R.id.text1,
                 new String[]{
-                        getString(R.string.title_section1),
-                        getString(R.string.title_section2),
-                        getString(R.string.title_section3),
+                        getString(R.string.title_my_account),
+                        getString(R.string.title_hot_buys),
+                        getString(R.string.title_messages),
+                        getString(R.string.title_calendar),
+                        getString(R.string.title_logout),
                 }));
         mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
         return mDrawerListView;
@@ -263,7 +267,9 @@ public class NavigationDrawerFragment extends Fragment {
         ActionBar actionBar = getActionBar();
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setTitle(R.string.app_name);
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.RED));
+        actionBar.setTitle(R.string.dashboard);
+        actionBar.setCustomView(R.layout.abs_title_bar);
     }
 
     private ActionBar getActionBar() {

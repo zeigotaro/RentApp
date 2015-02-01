@@ -2,6 +2,8 @@ package com.lindycoder.glenn.rentapp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
@@ -36,6 +38,8 @@ import org.json.JSONObject;
 import org.json.JSONArray;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 
@@ -51,9 +55,8 @@ public class AccountMainActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
-    private int mMessageCount = 0;
-    private int mEventCount = 0;
-    private int mProductCount = 0;
+    private HashMap<String, ArrayList<String>> mListMap = new HashMap<>();
+    private Date mLastUpdated = null;
 
     private UserGetObjectCountsTask mCountTask = null;
 
@@ -91,21 +94,32 @@ public class AccountMainActivity extends ActionBarActivity
     public void onNavigationDrawerItemSelected(int position) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction()
-                .replace(R.id.container, PlaceholderFragment.newInstance(position + 1))
-                .commit();
+        if(fragmentManager != null) {
+            Fragment fragment = getFragmentInstance(position + 1);
+            if(fragment != null) {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, fragment)
+                        .commit();
+            }
+        }
     }
 
     public void onSectionAttached(int number) {
         switch (number) {
             case 1:
-                mTitle = getString(R.string.title_section1);
+                mTitle = getString(R.string.title_my_account);
                 break;
             case 2:
-                mTitle = getString(R.string.title_section2);
+                mTitle = getString(R.string.title_hot_buys);
                 break;
             case 3:
-                mTitle = getString(R.string.title_section3);
+                mTitle = getString(R.string.title_messages);
+                break;
+            case 4:
+                mTitle = getString(R.string.title_calendar);
+                break;
+            case 5:
+                mTitle = getString(R.string.title_logout);
                 break;
         }
     }
@@ -114,12 +128,13 @@ public class AccountMainActivity extends ActionBarActivity
         ActionBar actionBar = getSupportActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setTitle(mTitle);
+        actionBar.setCustomView(R.string.dashboard);
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.RED));
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem item= menu.findItem(R.id.action_settings);
+        MenuItem item = menu.findItem(R.id.action_settings);
         item.setVisible(false);
         super.onPrepareOptionsMenu(menu);
         return true;
@@ -153,27 +168,16 @@ public class AccountMainActivity extends ActionBarActivity
         return super.onOptionsItemSelected(item);
     }
 
-    public void setMessageCount(int messageCount) {
-        Log.i("MESSAGE_COUNT", Integer.toString(messageCount));
-        if(messageCount != mMessageCount) {
-            mMessageCount = messageCount;
-            refreshImg("message_img_id", messageCount);
-        }
-    }
-
-    public void setEventCount(int eventCount) {
-        Log.i("EVENT_COUNT", Integer.toString(eventCount));
-        if(eventCount != mEventCount) {
-            mEventCount = eventCount;
-            refreshImg("event_img_id", eventCount);
-        }
-    }
-
-    public void setProductCount(int productCount) {
-        Log.i("PRODUCT_COUNT", Integer.toString(productCount));
-        if(productCount != mProductCount) {
-            mProductCount = productCount;
-            refreshImg("product_img_id", productCount);
+    public void updateLists() {
+        for (HashMap.Entry<String, ArrayList<String>> entry : mListMap.entrySet()) {
+            String key = entry.getKey();
+            ArrayList<String> list = entry.getValue();
+            int count = list.size();
+            for(String el : list) {
+                Log.i(key, el);
+            }
+            Log.i(key + "_COUNT", Integer.toString(count));
+            refreshImg(key + "_img_id", count);
         }
     }
 
@@ -186,6 +190,10 @@ public class AccountMainActivity extends ActionBarActivity
         }
     }
 
+    private Fragment getFragmentInstance(int id)
+    {
+       return PlaceholderFragment.newInstance(id);
+    }
 
     /**
      * A placeholder fragment containing a simple view.
@@ -206,6 +214,7 @@ public class AccountMainActivity extends ActionBarActivity
             Bundle args = new Bundle();
             args.putInt(ARG_SECTION_NUMBER, sectionNumber);
             fragment.setArguments(args);
+            Log.i("PLACEHOLDER_FRAG", Integer.toString(sectionNumber));
             return fragment;
         }
 
@@ -240,19 +249,20 @@ public class AccountMainActivity extends ActionBarActivity
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            String message_post = getString(R.string.http_message_post_url);
-            String hot_buy_post = getString(R.string.http_hot_buy_post_url);
-            String event_post = getString(R.string.http_event_post_url);
-            String message_param = "Messages";
-            String product_param = "Products";
-            String event_param = "Events";
-            setMessageCount(getObjectCount(message_post, message_param));
-            setProductCount(getObjectCount(hot_buy_post, product_param));
-            setEventCount(getObjectCount(event_post, event_param));
+            HashMap<String, String> map = new HashMap<>();
+            map.put("Messages", getString(R.string.http_message_post_url));
+            map.put("Products", getString(R.string.http_hot_buy_post_url));
+            map.put("Events", getString(R.string.http_event_post_url));
+
+            for(HashMap.Entry<String, String> entry : map.entrySet()) {
+                fillList(entry.getValue(), entry.getKey());
+            }
+            mLastUpdated = new Date();
+            updateLists();
             return true;
         }
 
-        private int getObjectCount(String post_url, String param_name) {
+        private int fillList(String post_url, String param_name) {
             int retCount = 0;
             HttpClient client = new DefaultHttpClient();
             HttpPost httpPost = new HttpPost(post_url);
@@ -271,7 +281,17 @@ public class AccountMainActivity extends ActionBarActivity
                     Log.i("RESULT_CODE", resultCode);
                     Log.i("RESULT_MSG", resultMsg);
                     if ((resultCode != null) && resultCode.equals(getString(R.string.post_success))) {
-                        retCount = result.getJSONArray(param_name).length();
+                        JSONArray jArray = result.getJSONArray(param_name);
+                        if(jArray != null) {
+                            retCount = jArray.length();
+
+                            //fill object list and add it to map
+                            ArrayList<String> list = new ArrayList<>();
+                            for (int i=0;i<jArray.length();i++){
+                                list.add(jArray.get(i).toString());
+                            }
+                            mListMap.put(param_name, list);
+                        }
                     }
                 }
             } catch (IOException | JSONException e) {
