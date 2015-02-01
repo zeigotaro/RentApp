@@ -13,5 +13,10 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
     <string name="dashboard">DASHBOARD</string>
+    <string name="messages">Messages</string>
+    <string name="products">Products</string>
+    <string name="events">Events</string>
+    <string name="inbox">Inbox</string>
+    <string name="hot_buys">Hot Buys</string>
 
 </resources>

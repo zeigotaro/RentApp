@@ -1,10 +1,12 @@
 package com.lindycoder.glenn.rentapp;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
+import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
@@ -22,6 +24,9 @@ import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import org.apache.http.HttpEntity;
@@ -37,10 +42,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
+
+import android.text.format.DateUtils;
 
 
 public class AccountMainActivity extends ActionBarActivity
@@ -55,10 +65,12 @@ public class AccountMainActivity extends ActionBarActivity
      * Used to store the last screen title. For use in {@link #restoreActionBar()}.
      */
     private CharSequence mTitle;
-    private HashMap<String, ArrayList<String>> mListMap = new HashMap<>();
+    private HashMap<String, JSONArray> mListMap = new HashMap<>();
     private Date mLastUpdated = null;
 
     private UserGetObjectCountsTask mCountTask = null;
+
+    private ActionBar mActionBar = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,11 +137,19 @@ public class AccountMainActivity extends ActionBarActivity
     }
 
     public void restoreActionBar() {
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-        actionBar.setDisplayShowTitleEnabled(true);
-        actionBar.setCustomView(R.string.dashboard);
-        actionBar.setBackgroundDrawable(new ColorDrawable(Color.RED));
+        if(mActionBar == null) {
+            mActionBar = getSupportActionBar();
+            mActionBar.setTitle(getString(R.string.dashboard));
+        }
+        mActionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+        mActionBar.setDisplayShowTitleEnabled(true);
+        mActionBar.setBackgroundDrawable(new ColorDrawable(Color.RED));
+    }
+
+    public void setActionBarTitle(String newTitle) {
+        if(mActionBar != null) {
+            mActionBar.setTitle(newTitle);
+        }
     }
 
     @Override
@@ -169,12 +189,16 @@ public class AccountMainActivity extends ActionBarActivity
     }
 
     public void updateLists() {
-        for (HashMap.Entry<String, ArrayList<String>> entry : mListMap.entrySet()) {
+        for (HashMap.Entry<String, JSONArray> entry : mListMap.entrySet()) {
             String key = entry.getKey();
-            ArrayList<String> list = entry.getValue();
-            int count = list.size();
-            for(String el : list) {
-                Log.i(key, el);
+            JSONArray jArray = entry.getValue();
+            int count = jArray.length();
+            for(int i = 0; i < count; i++) {
+                try {
+                    Log.i(key, jArray.get(i).toString());
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
             Log.i(key + "_COUNT", Integer.toString(count));
             refreshImg(key + "_img_id", count);
@@ -184,17 +208,160 @@ public class AccountMainActivity extends ActionBarActivity
     private void refreshImg(String img_id, int count) {
         if(count > 0) {
             //TODO: Refresh/set bubble
-        }
-        else {
+        } else {
             //TODO: Remove bubble
         }
     }
 
     private Fragment getFragmentInstance(int id)
     {
-       return PlaceholderFragment.newInstance(id);
+        switch (id) {
+            case 3:
+                return MessageFragment.newInstance(id);
+            default:
+                return PlaceholderFragment.newInstance(id);
+        }
     }
 
+    public static class MessageFragment extends ListFragment {
+        // Progress Dialog
+        private ProgressDialog pDialog;
+
+        ArrayList<HashMap<String, String>> inboxList;
+
+        // products JSONArray
+        JSONArray inbox = null;
+
+        // ALL JSON node names
+        private static final String TAG_ID = "ID";
+        private static final String TAG_SENDER = "Sender";
+        private static final String TAG_EMAIL = "email";
+        private static final String TAG_TITLE = "Title";
+        private static final String TAG_DATE_ADDED = "DateAdded";
+        private static final String TAG_DATE = "date";
+
+        private static final String ARG_SECTION_NUMBER = "section_number";
+
+        public static MessageFragment newInstance(int sectionNumber) {
+            MessageFragment fragment = new MessageFragment();
+            Log.i("MESSAGE_FRAG", Integer.toString(sectionNumber));
+            Bundle args = new Bundle();
+            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        public MessageFragment() {
+        }
+
+        @Override
+        public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                                 Bundle savedInstanceState) {
+            View rootView = inflater.inflate(R.layout.inbox_list, container, false);
+            ((AccountMainActivity) getActivity()).setActionBarTitle(getString(R.string.inbox));
+
+            // Hashmap for ListView
+            inboxList = new ArrayList<HashMap<String, String>>();
+
+            // Loading INBOX in Background Thread
+            new LoadInbox(rootView.getContext()).execute();
+            return rootView;
+        }
+
+        @Override
+        public void onAttach(Activity activity) {
+            super.onAttach(activity);
+            ((AccountMainActivity) activity).onSectionAttached(
+                    getArguments().getInt(ARG_SECTION_NUMBER));
+        }
+
+        /**
+         * Background Async Task to Load all INBOX messages by making HTTP Request
+         */
+        private class LoadInbox extends AsyncTask<String, String, String> {
+
+            private Context mContext;
+
+            public LoadInbox(Context context) {
+                mContext = context;
+            }
+
+            /**
+             * getting Inbox JSON
+             */
+            protected String doInBackground(String... args) {
+
+                try {
+                    inbox = ((AccountMainActivity) getActivity()).mListMap.get(getString(R.string.messages));
+                    // looping through All messages
+                    for (int i = 0; i < inbox.length(); i++) {
+                        JSONObject c = inbox.getJSONObject(i);
+
+                        // Storing each json item in variable
+                        String id = c.getString(TAG_ID);
+                        String sender = c.getString(TAG_SENDER);
+                        String title = c.getString(TAG_TITLE);
+                        JSONObject d = c.getJSONObject(TAG_DATE_ADDED);
+                        String date = d.getString(TAG_DATE);
+                        String parsed_date = parseDate(date);
+
+                        // creating new HashMap
+                        HashMap<String, String> map = new HashMap<>();
+
+                        // adding each child node to HashMap key => value
+                        map.put(TAG_ID, id);
+                        map.put(TAG_SENDER, sender);
+                        map.put(TAG_TITLE, title);
+                        map.put(TAG_DATE, parsed_date);
+
+                        // adding HashList to ArrayList
+                        inboxList.add(map);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        /**
+                         * Updating parsed JSON data into ListView
+                         * */
+                         ListAdapter adapter = new SimpleAdapter(
+                                getActivity(),
+                                inboxList,
+                                R.layout.inbox_list_item,
+                                new String[] { TAG_SENDER, TAG_TITLE, TAG_DATE },
+                                new int[] { R.id.from, R.id.subject, R.id.date });
+                         // updating listview
+                         setListAdapter(adapter);
+                    }
+                });
+
+                return null;
+            }
+
+            private String parseDate(String inDate) {
+                SimpleDateFormat old_fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
+                old_fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
+                try {
+                    Date parsedDate = old_fmt.parse(inDate);
+                    long timeInMillis = parsedDate.getTime();
+                    String retDateString;
+                    if(DateUtils.isToday(timeInMillis)) {
+                        retDateString  = DateUtils.formatDateTime(mContext, timeInMillis, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME);
+                    } else {
+                        retDateString  = DateUtils.formatDateTime(mContext, timeInMillis, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR);
+                    }
+                    return retDateString;
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                return null;
+            }
+        }
+    }
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -225,6 +392,7 @@ public class AccountMainActivity extends ActionBarActivity
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_account_main, container, false);
+            ((AccountMainActivity) getActivity()).setActionBarTitle(getString(R.string.hot_buys));
             return rootView;
         }
 
@@ -250,9 +418,9 @@ public class AccountMainActivity extends ActionBarActivity
         @Override
         protected Boolean doInBackground(Void... params) {
             HashMap<String, String> map = new HashMap<>();
-            map.put("Messages", getString(R.string.http_message_post_url));
-            map.put("Products", getString(R.string.http_hot_buy_post_url));
-            map.put("Events", getString(R.string.http_event_post_url));
+            map.put(getString(R.string.messages), getString(R.string.http_message_post_url));
+            map.put(getString(R.string.products), getString(R.string.http_hot_buy_post_url));
+            map.put(getString(R.string.events), getString(R.string.http_event_post_url));
 
             for(HashMap.Entry<String, String> entry : map.entrySet()) {
                 fillList(entry.getValue(), entry.getKey());
@@ -285,12 +453,14 @@ public class AccountMainActivity extends ActionBarActivity
                         if(jArray != null) {
                             retCount = jArray.length();
 
+                            /*
                             //fill object list and add it to map
                             ArrayList<String> list = new ArrayList<>();
                             for (int i=0;i<jArray.length();i++){
                                 list.add(jArray.get(i).toString());
                             }
-                            mListMap.put(param_name, list);
+                            */
+                            mListMap.put(param_name, jArray);
                         }
                     }
                 }

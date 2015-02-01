@@ -268,7 +268,6 @@ public class NavigationDrawerFragment extends Fragment {
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setBackgroundDrawable(new ColorDrawable(Color.RED));
-        actionBar.setTitle(R.string.dashboard);
         actionBar.setCustomView(R.layout.abs_title_bar);
     }
 
