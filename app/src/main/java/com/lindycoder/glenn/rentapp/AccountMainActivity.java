@@ -154,8 +154,6 @@ public class AccountMainActivity extends ActionBarActivity
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem item = menu.findItem(R.id.action_settings);
-        item.setVisible(false);
         super.onPrepareOptionsMenu(menu);
         return true;
     }
@@ -178,13 +176,6 @@ public class AccountMainActivity extends ActionBarActivity
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -217,151 +208,18 @@ public class AccountMainActivity extends ActionBarActivity
     {
         switch (id) {
             case 3:
-                return MessageFragment.newInstance(id);
+                return InboxFragment.newInstance(id);
+            case 4:
+                return CalendarFragment.newInstance(id);
             default:
                 return PlaceholderFragment.newInstance(id);
         }
     }
 
-    public static class MessageFragment extends ListFragment {
-        // Progress Dialog
-        private ProgressDialog pDialog;
-
-        ArrayList<HashMap<String, String>> inboxList;
-
-        // products JSONArray
-        JSONArray inbox = null;
-
-        // ALL JSON node names
-        private static final String TAG_ID = "ID";
-        private static final String TAG_SENDER = "Sender";
-        private static final String TAG_EMAIL = "email";
-        private static final String TAG_TITLE = "Title";
-        private static final String TAG_DATE_ADDED = "DateAdded";
-        private static final String TAG_DATE = "date";
-
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        public static MessageFragment newInstance(int sectionNumber) {
-            MessageFragment fragment = new MessageFragment();
-            Log.i("MESSAGE_FRAG", Integer.toString(sectionNumber));
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
-        public MessageFragment() {
-        }
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.inbox_list, container, false);
-            ((AccountMainActivity) getActivity()).setActionBarTitle(getString(R.string.inbox));
-
-            // Hashmap for ListView
-            inboxList = new ArrayList<HashMap<String, String>>();
-
-            // Loading INBOX in Background Thread
-            new LoadInbox(rootView.getContext()).execute();
-            return rootView;
-        }
-
-        @Override
-        public void onAttach(Activity activity) {
-            super.onAttach(activity);
-            ((AccountMainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
-        }
-
-        /**
-         * Background Async Task to Load all INBOX messages by making HTTP Request
-         */
-        private class LoadInbox extends AsyncTask<String, String, String> {
-
-            private Context mContext;
-
-            public LoadInbox(Context context) {
-                mContext = context;
-            }
-
-            /**
-             * getting Inbox JSON
-             */
-            protected String doInBackground(String... args) {
-
-                try {
-                    inbox = ((AccountMainActivity) getActivity()).mListMap.get(getString(R.string.messages));
-                    // looping through All messages
-                    for (int i = 0; i < inbox.length(); i++) {
-                        JSONObject c = inbox.getJSONObject(i);
-
-                        // Storing each json item in variable
-                        String id = c.getString(TAG_ID);
-                        String sender = c.getString(TAG_SENDER);
-                        String title = c.getString(TAG_TITLE);
-                        JSONObject d = c.getJSONObject(TAG_DATE_ADDED);
-                        String date = d.getString(TAG_DATE);
-                        String parsed_date = parseDate(date);
-
-                        // creating new HashMap
-                        HashMap<String, String> map = new HashMap<>();
-
-                        // adding each child node to HashMap key => value
-                        map.put(TAG_ID, id);
-                        map.put(TAG_SENDER, sender);
-                        map.put(TAG_TITLE, title);
-                        map.put(TAG_DATE, parsed_date);
-
-                        // adding HashList to ArrayList
-                        inboxList.add(map);
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-                getActivity().runOnUiThread(new Runnable() {
-                    public void run() {
-                        /**
-                         * Updating parsed JSON data into ListView
-                         * */
-                         ListAdapter adapter = new SimpleAdapter(
-                                getActivity(),
-                                inboxList,
-                                R.layout.inbox_list_item,
-                                new String[] { TAG_SENDER, TAG_TITLE, TAG_DATE },
-                                new int[] { R.id.from, R.id.subject, R.id.date });
-                         // updating listview
-                         setListAdapter(adapter);
-                    }
-                });
-
-                return null;
-            }
-
-            private String parseDate(String inDate) {
-                SimpleDateFormat old_fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
-                old_fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
-                try {
-                    Date parsedDate = old_fmt.parse(inDate);
-                    long timeInMillis = parsedDate.getTime();
-                    String retDateString;
-                    if(DateUtils.isToday(timeInMillis)) {
-                        retDateString  = DateUtils.formatDateTime(mContext, timeInMillis, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME);
-                    } else {
-                        retDateString  = DateUtils.formatDateTime(mContext, timeInMillis, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR);
-                    }
-                    return retDateString;
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
-
-                return null;
-            }
-        }
+    public HashMap<String, JSONArray> getListMap() {
+        return mListMap;
     }
+
     /**
      * A placeholder fragment containing a simple view.
      */
