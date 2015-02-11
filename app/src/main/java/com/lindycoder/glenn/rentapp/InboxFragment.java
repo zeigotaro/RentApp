@@ -22,6 +22,7 @@ import org.json.JSONObject;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TimeZone;
@@ -110,7 +111,7 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                     String text = c.getString(TAG_TEXT);
                     JSONObject d = c.getJSONObject(TAG_DATE_ADDED);
                     String date = d.getString(TAG_DATE);
-                    String parsed_date = parseDate(date);
+                    String parsed_date = parseDate(date, "UTC");
 
                     // creating new HashMap
                     HashMap<String, String> map = new HashMap<>();
@@ -149,24 +150,18 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
             return null;
         }
 
-        private String parseDate(String inDate) {
-            SimpleDateFormat old_fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");
-            old_fmt.setTimeZone(TimeZone.getTimeZone("UTC"));
-            try {
-                Date parsedDate = old_fmt.parse(inDate);
-                long timeInMillis = parsedDate.getTime();
-                String retDateString;
-                if(DateUtils.isToday(timeInMillis)) {
-                    retDateString  = DateUtils.formatDateTime(mContext, timeInMillis, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME);
+        private String parseDate(String inDate, String timeZone) {
+            String retDateString = null;
+            Calendar cal = GlennUtils.parseCalFromJSON(inDate, timeZone);
+            if(cal != null) {
+                long timeInMillis = cal.getTimeInMillis();
+                if (DateUtils.isToday(timeInMillis)) {
+                    retDateString = DateUtils.formatDateTime(mContext, timeInMillis, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_SHOW_TIME);
                 } else {
-                    retDateString  = DateUtils.formatDateTime(mContext, timeInMillis, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR);
+                    retDateString = DateUtils.formatDateTime(mContext, timeInMillis, DateUtils.FORMAT_SHOW_DATE | DateUtils.FORMAT_NUMERIC_DATE | DateUtils.FORMAT_SHOW_YEAR);
                 }
-                return retDateString;
-            } catch (ParseException e) {
-                e.printStackTrace();
             }
-
-            return null;
+            return retDateString;
         }
     }
 }

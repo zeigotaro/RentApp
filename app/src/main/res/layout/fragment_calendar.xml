@@ -3,12 +3,10 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
-    <com.lindycoder.glenn.rentapp.CustomCalendarView
+    <com.lindycoder.glenn.rentapp.EventCalendarView
         android:id="@+id/calendar_view"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:showWeekNumber="false"
-        android:selectedWeekBackgroundColor="@android:color/transparent" />
+        android:layout_height="match_parent" />
 
 
 </LinearLayout>

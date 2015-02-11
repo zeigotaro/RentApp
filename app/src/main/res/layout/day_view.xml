@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:minHeight="@dimen/min_cell_height"
+    android:minWidth="@dimen/min_cell_width" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <FrameLayout
+            android:layout_width="@dimen/text_height_width"
+            android:layout_height="@dimen/text_height_width"
+            android:layout_centerInParent="true"
+            android:id="@+id/today_frame"
+            android:background="@drawable/today" />
+
+        <FrameLayout
+            android:layout_width="@dimen/text_height_width"
+            android:layout_height="@dimen/text_height_width"
+            android:layout_centerInParent="true"
+            android:id="@+id/event_frame"
+            android:background="@drawable/event_day" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="@dimen/text_height_width"
+            android:layout_height="@dimen/text_height_width"
+            android:layout_centerInParent="true"
+            android:background="@drawable/date_number_background"
+            android:gravity="center"
+            android:text="31"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/date_number_text_color" />
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/badge_overlay" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

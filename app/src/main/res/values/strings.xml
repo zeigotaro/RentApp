@@ -20,5 +20,11 @@
     <string name="hot_buys">Hot Buys</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="calendar">Calendar</string>
-
+    <string name="monday">MON</string>
+    <string name="tuesday">TUE</string>
+    <string name="wednesday">WED</string>
+    <string name="thursday">THU</string>
+    <string name="friday">FRI</string>
+    <string name="saturday">SAT</string>
+    <string name="sunday">SUN</string>
 </resources>
