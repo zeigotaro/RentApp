@@ -1,0 +1,35 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_alignParentTop="true"
+        android:id="@+id/hotbuy_space" />
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="200dp"
+        android:layout_marginLeft="25dp"
+        android:id="@+id/message_space"
+        android:layout_below="@+id/hotbuy_space"
+        android:layout_alignParentLeft="true" />
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="200dp"
+        android:layout_marginRight="25dp"
+        android:id="@+id/cal_space"
+        android:layout_alignTop="@+id/message_space"
+        android:layout_alignParentRight="true"  />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="@string/hot_buys"
+        android:layout_below="@id/message_space"/>
+
+</RelativeLayout>

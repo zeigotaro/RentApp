@@ -9,6 +9,7 @@ import java.util.TimeZone;
 /**
  * Created by gh250086 on 2/10/2015.
  */
+
 public class GlennUtils {
     public static Calendar parseCalFromJSON(String inDate, String timeZone) {
         SimpleDateFormat old_fmt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSSSSS");

@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 
 public class CalendarFragment extends Fragment {
+    private static final FragmentId fragmentId = FragmentId.EVENTS;
     private EventCalendarView calendarView;
     private int yr, mon, dy;
     private Calendar selectedDate;
@@ -33,11 +34,10 @@ public class CalendarFragment extends Fragment {
     private static final String TAG_TIMEZONE_TYPE= "timezone_type";
     private static final String TAG_TIMEZONE= "timezone";
 
-    public static CalendarFragment newInstance(int sectionNumber) {
+    public static CalendarFragment newInstance() {
         CalendarFragment fragment = new CalendarFragment();
-        Log.i("CALENDAR_FRAG", Integer.toString(sectionNumber));
         Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        args.putInt(ARG_SECTION_NUMBER, fragmentId.getValue());
         fragment.setArguments(args);
         return fragment;
     }
@@ -51,7 +51,7 @@ public class CalendarFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_calendar, container, false);
 
         // products JSONArray
-        JSONArray eventArray = ((AccountMainActivity) getActivity()).getListMap().get(getString(R.string.events));
+        JSONArray eventArray = ((AccountMainActivity) getActivity()).getEvents();
         HashMap<Integer, HashMap<Integer, Event>> monthEventMap = parseArrayToMap(eventArray);
 
 

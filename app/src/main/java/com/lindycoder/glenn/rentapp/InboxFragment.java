@@ -34,6 +34,7 @@ import java.util.TimeZone;
  */
 public class InboxFragment extends android.support.v4.app.ListFragment {
 
+    private static final FragmentId fragmentId = FragmentId.MESSAGES;
     ArrayList<HashMap<String, String>> inboxList;
 
     // products JSONArray
@@ -49,11 +50,10 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
 
     private static final String ARG_SECTION_NUMBER = "section_number";
 
-    public static InboxFragment newInstance(int sectionNumber) {
+    public static InboxFragment newInstance() {
         InboxFragment fragment = new InboxFragment();
-        Log.i("MESSAGE_FRAG", Integer.toString(sectionNumber));
         Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, sectionNumber);
+        args.putInt(ARG_SECTION_NUMBER, fragmentId.getValue());
         fragment.setArguments(args);
         return fragment;
     }
@@ -99,7 +99,7 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
         protected String doInBackground(String... args) {
 
             try {
-                inbox = ((AccountMainActivity) getActivity()).getListMap().get(getString(R.string.messages));
+                inbox = ((AccountMainActivity) getActivity()).getMessages();
                 // looping through All messages
                 for (int i = 0; i < inbox.length(); i++) {
                     JSONObject c = inbox.getJSONObject(i);

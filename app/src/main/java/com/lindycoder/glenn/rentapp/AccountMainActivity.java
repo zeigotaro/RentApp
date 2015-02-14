@@ -71,6 +71,7 @@ public class AccountMainActivity extends ActionBarActivity
     private UserGetObjectCountsTask mCountTask = null;
 
     private ActionBar mActionBar = null;
+    private final FragmentId[] myFragmentIdValues = FragmentId.values();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,10 +105,14 @@ public class AccountMainActivity extends ActionBarActivity
 
     @Override
     public void onNavigationDrawerItemSelected(int position) {
+        changeToFragment(myFragmentIdValues[position]);
+    }
+
+    public void changeToFragment(FragmentId fragmentId) {
         // update the main content by replacing fragments
         FragmentManager fragmentManager = getSupportFragmentManager();
         if(fragmentManager != null) {
-            Fragment fragment = getFragmentInstance(position + 1);
+            Fragment fragment = getFragmentInstance(fragmentId);
             if(fragment != null) {
                 fragmentManager.beginTransaction()
                         .replace(R.id.container, fragment)
@@ -204,22 +209,31 @@ public class AccountMainActivity extends ActionBarActivity
         }
     }
 
-    private Fragment getFragmentInstance(int id)
+    private Fragment getFragmentInstance(FragmentId fragmentId)
     {
-        switch (id) {
-            case 3:
-                return InboxFragment.newInstance(id);
-            case 4:
-                return CalendarFragment.newInstance(id);
+        switch (fragmentId) {
+            case HOME:
+                return HomeFragment.newInstance();
+            case MESSAGES:
+                return InboxFragment.newInstance();
+            case EVENTS:
+                return CalendarFragment.newInstance();
             default:
-                return PlaceholderFragment.newInstance(id);
+                return PlaceholderFragment.newInstance(fragmentId.getValue());
         }
     }
 
-    public HashMap<String, JSONArray> getListMap() {
+    /*public HashMap<String, JSONArray> getListMap() {
         return mListMap;
+    }*/
+
+    public JSONArray getEvents() {
+        return mListMap.get(getString(R.string.events));
     }
 
+    public JSONArray getMessages() {
+        return mListMap.get(getString(R.string.messages));
+    }
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -310,14 +324,6 @@ public class AccountMainActivity extends ActionBarActivity
                         JSONArray jArray = result.getJSONArray(param_name);
                         if(jArray != null) {
                             retCount = jArray.length();
-
-                            /*
-                            //fill object list and add it to map
-                            ArrayList<String> list = new ArrayList<>();
-                            for (int i=0;i<jArray.length();i++){
-                                list.add(jArray.get(i).toString());
-                            }
-                            */
                             mListMap.put(param_name, jArray);
                         }
                     }

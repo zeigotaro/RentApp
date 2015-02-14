@@ -62,17 +62,11 @@ public class CalendarAdapter extends BaseAdapter{
 	}
 	
 	public int getPrevMonth(){
-		if(cal.get(Calendar.MONTH) == cal.getActualMinimum(Calendar.MONTH)){
+		if(cal.get(Calendar.MONTH) == cal.getActualMinimum(Calendar.MONTH)) {
 			cal.set(Calendar.YEAR, cal.get(Calendar.YEAR)-1);
-		}else{
-			
 		}
 		int month = cal.get(Calendar.MONTH);
-		if(month == 0){
-			return month = 11;
-		}
-		
-		return month-1;
+		return (month == 0) ? 11 : (month - 1);
 	}
 	
 	@Override
@@ -96,7 +90,8 @@ public class CalendarAdapter extends BaseAdapter{
 				today_layout.setVisibility(View.GONE);
 			}
 
-            if(eventMap.containsKey(d.getDay())){
+            int day = d.getDay();
+            if(eventMap.containsKey(day) && (eventMap.get(day).getDay().getYear() == d.getYear())){
                 Log.i("EVENT_MAP_LAYOUT", "Event found, day: " + Integer.toString(d.getDay()));
                 event_layout.setVisibility(View.VISIBLE);
             }else{
@@ -135,7 +130,12 @@ public class CalendarAdapter extends BaseAdapter{
     }
 	public void refreshDays(HashMap<Integer, Event> newMap)
     {
-        this.eventMap = newMap;
+        if(newMap != null) {
+            this.eventMap = newMap;
+        } else {
+            this.eventMap = new HashMap<>();
+        }
+
     	// clear items
     	dayList.clear();
     	
