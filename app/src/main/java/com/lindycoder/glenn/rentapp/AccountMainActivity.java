@@ -110,32 +110,38 @@ public class AccountMainActivity extends ActionBarActivity
 
     public void changeToFragment(FragmentId fragmentId) {
         // update the main content by replacing fragments
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        if(fragmentManager != null) {
-            Fragment fragment = getFragmentInstance(fragmentId);
-            if(fragment != null) {
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, fragment)
-                        .commit();
+        if(fragmentId != FragmentId.LOGOUT) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            if(fragmentManager != null) {
+                Fragment fragment = getFragmentInstance(fragmentId);
+                if(fragment != null) {
+                    fragmentManager.beginTransaction()
+                            .replace(R.id.container, fragment)
+                            .commit();
+                }
             }
+        } else {
+            //Logout of app
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
         }
     }
 
-    public void onSectionAttached(int number) {
-        switch (number) {
-            case 1:
+    public void onSectionAttached(FragmentId fragmentId) {
+        switch (fragmentId) {
+            case HOME:
                 mTitle = getString(R.string.title_my_account);
                 break;
-            case 2:
+            case HOTBUYS:
                 mTitle = getString(R.string.title_hot_buys);
                 break;
-            case 3:
+            case MESSAGES:
                 mTitle = getString(R.string.title_messages);
                 break;
-            case 4:
+            case EVENTS:
                 mTitle = getString(R.string.title_calendar);
                 break;
-            case 5:
+            case LOGOUT:
                 mTitle = getString(R.string.title_logout);
                 break;
         }
@@ -211,15 +217,13 @@ public class AccountMainActivity extends ActionBarActivity
 
     private Fragment getFragmentInstance(FragmentId fragmentId)
     {
+        Log.i("MAIN", "getFragInstance, id: " + Integer.toString(fragmentId.getValue()));
         switch (fragmentId) {
-            case HOME:
-                return HomeFragment.newInstance();
-            case MESSAGES:
-                return InboxFragment.newInstance();
-            case EVENTS:
-                return CalendarFragment.newInstance();
-            default:
-                return PlaceholderFragment.newInstance(fragmentId.getValue());
+            case HOME:       return HomeFragment.newInstance();
+            case HOTBUYS:    return HotbuyListFragment.newInstance();
+            case MESSAGES:   return InboxFragment.newInstance();
+            case EVENTS:     return CalendarFragment.newInstance();
+            default:         return PlaceholderFragment.newInstance(fragmentId.getValue());
         }
     }
 
@@ -233,6 +237,10 @@ public class AccountMainActivity extends ActionBarActivity
 
     public JSONArray getMessages() {
         return mListMap.get(getString(R.string.messages));
+    }
+
+    public JSONArray getHotbuys() {
+        return mListMap.get(getString(R.string.products));
     }
     /**
      * A placeholder fragment containing a simple view.
@@ -271,8 +279,7 @@ public class AccountMainActivity extends ActionBarActivity
         @Override
         public void onAttach(Activity activity) {
             super.onAttach(activity);
-            ((AccountMainActivity) activity).onSectionAttached(
-                    getArguments().getInt(ARG_SECTION_NUMBER));
+            ((AccountMainActivity) activity).onSectionAttached(FragmentId.LOGOUT);
         }
     }
     /**

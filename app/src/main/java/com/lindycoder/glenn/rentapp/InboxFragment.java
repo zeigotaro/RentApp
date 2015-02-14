@@ -48,13 +48,8 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
     private static final String TAG_DATE_ADDED = "DateAdded";
     private static final String TAG_DATE = "date";
 
-    private static final String ARG_SECTION_NUMBER = "section_number";
-
     public static InboxFragment newInstance() {
         InboxFragment fragment = new InboxFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, fragmentId.getValue());
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -78,8 +73,7 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        ((AccountMainActivity) activity).onSectionAttached(
-                getArguments().getInt(ARG_SECTION_NUMBER));
+        ((AccountMainActivity) activity).onSectionAttached(fragmentId);
     }
 
     /**

@@ -24,7 +24,6 @@ public class CalendarFragment extends Fragment {
     private int yr, mon, dy;
     private Calendar selectedDate;
 
-    private static final String ARG_SECTION_NUMBER = "section_number";
     private static final String TAG_ID = "ID";
     private static final String TAG_TITLE = "Title";
     private static final String TAG_START_DATE = "StartDate";
@@ -36,9 +35,6 @@ public class CalendarFragment extends Fragment {
 
     public static CalendarFragment newInstance() {
         CalendarFragment fragment = new CalendarFragment();
-        Bundle args = new Bundle();
-        args.putInt(ARG_SECTION_NUMBER, fragmentId.getValue());
-        fragment.setArguments(args);
         return fragment;
     }
 
@@ -54,8 +50,7 @@ public class CalendarFragment extends Fragment {
         JSONArray eventArray = ((AccountMainActivity) getActivity()).getEvents();
         HashMap<Integer, HashMap<Integer, Event>> monthEventMap = parseArrayToMap(eventArray);
 
-
-                ((AccountMainActivity) getActivity()).setActionBarTitle(getString(R.string.calendar));
+        ((AccountMainActivity) getActivity()).setActionBarTitle(getString(R.string.calendar));
         Calendar c = Calendar.getInstance();
         yr = c.get(Calendar.YEAR);
         mon = c.get(Calendar.MONTH);
@@ -100,8 +95,7 @@ public class CalendarFragment extends Fragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        ((AccountMainActivity) activity).onSectionAttached(
-                getArguments().getInt(ARG_SECTION_NUMBER));
+        ((AccountMainActivity) activity).onSectionAttached(fragmentId);
     }
 
     private HashMap<Integer, HashMap<Integer, Event>> parseArrayToMap(JSONArray array) {
