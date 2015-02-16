@@ -3,12 +3,10 @@ package com.lindycoder.glenn.rentapp;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 
 import android.view.View;
@@ -113,7 +111,7 @@ public class CalendarFragment extends Fragment {
                 JSONObject dateAdded = c.getJSONObject(TAG_DATE_ADDED);
                 String jDate = startDate.getString(TAG_DATE);
                 String timeZone = startDate.getString(TAG_TIMEZONE);
-                Calendar cal = GlennUtils.parseCalFromJSON(jDate, timeZone);
+                Calendar cal = ParseUtils.parseCalFromJSON(jDate, timeZone);
                 if(cal != null) {
                     int month = cal.get(Calendar.MONTH);
                     int day = cal.get(Calendar.DAY_OF_MONTH);

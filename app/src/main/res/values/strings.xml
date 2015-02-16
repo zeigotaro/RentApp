@@ -15,10 +15,14 @@
     <string name="dashboard">DASHBOARD</string>
     <string name="messages">Messages</string>
     <string name="products">Products</string>
+    <string name="product">Product</string>
     <string name="events">Events</string>
     <string name="inbox">Inbox</string>
+    <string name="id_param_name">ID</string>
     <string name="hot_buys">Hot Buys</string>
+    <string name="open_hot_buys">Open Hot Buys</string>
     <string name="ending_soon">Hot Buys Ending Soon</string>
+    <string name="create_order">CREATE ORDER</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="calendar">Calendar</string>
     <string name="monday">MON</string>

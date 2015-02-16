@@ -4,26 +4,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <ImageView
+    <TextView
+        android:layout_width="250dip"
+        android:layout_height="50dp"
+        android:paddingLeft="30dip"
+        android:id="@+id/name_space" />
+    <TextView
+        android:layout_width="200dip"
+        android:layout_height="50dp"
+        android:id="@+id/price_space"
+        android:layout_toRightOf="@id/name_space"/>
+
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="250dp"
-        android:layout_alignParentTop="true"
-        android:id="@+id/hotbuy_space" />
+        android:layout_height="75dp"
+        android:paddingLeft="20dip"
+        android:paddingRight="20dip"
+        android:id="@+id/item_description"
+        android:layout_below="@+id/name_space" />
+
 
     <ImageView
         android:layout_width="150dp"
         android:layout_height="200dp"
-        android:layout_marginLeft="25dp"
-        android:id="@+id/message_space"
-        android:layout_below="@+id/hotbuy_space"
-        android:layout_alignParentLeft="true" />
+        android:id="@+id/image_space"
+        android:layout_below="@+id/item_description" />
 
-    <ImageView
-        android:layout_width="150dp"
-        android:layout_height="200dp"
-        android:layout_marginRight="25dp"
-        android:id="@+id/cal_space"
-        android:layout_alignTop="@+id/message_space"
-        android:layout_alignParentRight="true"  />
+    <Button
+        android:layout_width="150dip"
+        android:layout_height="50dp"
+        android:layout_centerInParent="true"
+        android:text="@string/create_order"
+        android:id="@+id/order_button"
+        android:background="@android:color/holo_red_dark"
+        android:textColor="@android:color/white"
+        android:layout_below="@id/image_space"/>
+
 
 </RelativeLayout>

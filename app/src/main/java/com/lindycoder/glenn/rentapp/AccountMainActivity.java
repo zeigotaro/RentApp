@@ -66,12 +66,14 @@ public class AccountMainActivity extends ActionBarActivity
      */
     private CharSequence mTitle;
     private HashMap<String, JSONArray> mListMap = new HashMap<>();
+    private HashMap<Integer, Product> mProductMap = null;
     private Date mLastUpdated = null;
 
     private UserGetObjectCountsTask mCountTask = null;
 
     private ActionBar mActionBar = null;
     private final FragmentId[] myFragmentIdValues = FragmentId.values();
+    private String mApiToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,8 +100,8 @@ public class AccountMainActivity extends ActionBarActivity
 
         // Get the message from the intent
         Intent intent = getIntent();
-        String apiToken = intent.getStringExtra(LoginActivity.API_TOKEN);
-        mCountTask = new UserGetObjectCountsTask(apiToken);
+        mApiToken = intent.getStringExtra(LoginActivity.API_TOKEN);
+        mCountTask = new UserGetObjectCountsTask();
         mCountTask.execute((Void) null);
     }
 
@@ -227,9 +229,9 @@ public class AccountMainActivity extends ActionBarActivity
         }
     }
 
-    /*public HashMap<String, JSONArray> getListMap() {
-        return mListMap;
-    }*/
+    public String getAPIToken() {
+        return mApiToken;
+    }
 
     public JSONArray getEvents() {
         return mListMap.get(getString(R.string.events));
@@ -239,9 +241,25 @@ public class AccountMainActivity extends ActionBarActivity
         return mListMap.get(getString(R.string.messages));
     }
 
-    public JSONArray getHotbuys() {
-        return mListMap.get(getString(R.string.products));
+    public HashMap<Integer, Product> getProductMap() {
+        return mProductMap;
     }
+
+    public void productItemSelected(int id) {
+        Log.i("PRODUCT_SELECTED", Integer.toString(id));
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        if(fragmentManager != null) {
+            Product p = mProductMap.get(id);
+            Fragment fragment = HotbuyFragment.newInstance(p);
+            if(fragment != null) {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.container, fragment)
+                        .commit();
+            }
+        }
+
+    }
+
     /**
      * A placeholder fragment containing a simple view.
      */
@@ -288,12 +306,7 @@ public class AccountMainActivity extends ActionBarActivity
      */
     public class UserGetObjectCountsTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mApiToken;
-
-        UserGetObjectCountsTask(String apiToken) {
-            mApiToken = apiToken;
-        }
-
+        UserGetObjectCountsTask() { }
         @Override
         protected Boolean doInBackground(Void... params) {
             HashMap<String, String> map = new HashMap<>();
@@ -305,6 +318,7 @@ public class AccountMainActivity extends ActionBarActivity
                 fillList(entry.getValue(), entry.getKey());
             }
             mLastUpdated = new Date();
+            parseToObjectLists();
             updateLists();
             return true;
         }
@@ -340,6 +354,13 @@ public class AccountMainActivity extends ActionBarActivity
                 e.printStackTrace();
             }
             return retCount;
+        }
+
+        private void parseToObjectLists() {
+            JSONArray j = mListMap.get(getString(R.string.products));
+            if(j != null) {
+                mProductMap = ParseUtils.parseProductMapFromJSON(j);
+            }
         }
     }
 

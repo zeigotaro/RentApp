@@ -4,14 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.text.format.DateUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -24,6 +23,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A fragment representing a list of "hot buy" products.
@@ -81,8 +81,8 @@ public class HotbuyListFragment extends android.support.v4.app.ListFragment {
 
         private final WeakReference<ListView> listViewReference;
         private Context mContext;
-        // products JSONArray
-        private JSONArray hbList = null;
+        // products map
+        private HashMap<Integer, Product> productMap = null;
 
         public LoadList(ListView listView) {
             // Use a WeakReference to ensure the listView can be garbage collected
@@ -94,39 +94,23 @@ public class HotbuyListFragment extends android.support.v4.app.ListFragment {
          */
         protected String doInBackground(String... args) {
 
-            try {
-                hbList = ((AccountMainActivity) getActivity()).getHotbuys();
-                // looping through All products
-                for (int i = 0; i < hbList.length(); i++) {
-                    JSONObject c = hbList.getJSONObject(i);
-                    Log.i("HOT_BUY_LIST", c.toString());
-                    JSONObject end_date = c.getJSONObject(TAG_END_DATE);
-                    Calendar cal = GlennUtils.parseCalFromJSON(end_date.getString(TAG_DATE), end_date.getString(TAG_TIMEZONE));
-                    Calendar rightNow = Calendar.getInstance();
+            productMap = ((AccountMainActivity) getActivity()).getProductMap();
+            // looping through All products
+            for (Map.Entry<Integer, Product> entry : productMap.entrySet()) {
+                Product p = entry.getValue();
+                if (p != null) {
+                    String id = Integer.toString(entry.getKey());
 
-                    if(cal.compareTo(rightNow) >= 0) {
-                        String id = c.getString(TAG_ID);
-                        String name = c.getString(TAG_NAME);
-                        String quantity = c.getString(TAG_QUANTITY);
-                        //String category = c.getString(TAG_CATEGORY);
-                        String category = ""; //NEED Category info from JSON object!
-                        String price = c.getString(TAG_PRICE);
-                        //String parsed_date = parseDate(date, "UTC");
+                    HashMap<String, String> map = new HashMap<>();
 
-                        HashMap<String, String> map = new HashMap<>();
+                    map.put(TAG_ID, id);
+                    map.put(TAG_NAME, p.getName());
+                    map.put(TAG_CATEGORY, "");
+                    map.put(TAG_QUANTITY, Integer.toString(p.getRemaining()));
+                    map.put(TAG_PRICE, Double.toString(p.getPrice()));
 
-                        map.put(TAG_ID, id);
-                        map.put(TAG_NAME, name);
-                        map.put(TAG_CATEGORY, category);
-                        map.put(TAG_QUANTITY, quantity);
-                        map.put(TAG_PRICE, price);
-
-                        hotbuyList.add(map);
-                    }
+                    hotbuyList.add(map);
                 }
-
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
 
             return null;
@@ -154,6 +138,12 @@ public class HotbuyListFragment extends android.support.v4.app.ListFragment {
                 if (listView != null) {
                     listView.setDivider(new ColorDrawable(Color.RED));
                     listView.setDividerHeight(2);
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            HashMap<String, String> itemMap = (HashMap<String, String>)listView.getItemAtPosition(position);
+                            ((AccountMainActivity) getActivity()).productItemSelected(Integer.parseInt(itemMap.get(TAG_ID)));
+                        }
+                    });
                 }
             }
         }

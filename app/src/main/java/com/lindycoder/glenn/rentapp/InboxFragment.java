@@ -4,28 +4,20 @@ import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.app.ListFragment;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.TimeZone;
 
 /**
  * A fragment representing a list of Items.
@@ -146,7 +138,7 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
 
         private String parseDate(String inDate, String timeZone) {
             String retDateString = null;
-            Calendar cal = GlennUtils.parseCalFromJSON(inDate, timeZone);
+            Calendar cal = ParseUtils.parseCalFromJSON(inDate, timeZone);
             if(cal != null) {
                 long timeInMillis = cal.getTimeInMillis();
                 if (DateUtils.isToday(timeInMillis)) {
