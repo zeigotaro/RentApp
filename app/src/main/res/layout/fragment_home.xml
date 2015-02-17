@@ -7,8 +7,26 @@
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="250dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="5dp"
         android:layout_alignParentTop="true"
-        android:id="@+id/hotbuy_space" />
+        android:id="@+id/hotbuy_space">
+        </ImageView>
+
+    <TextView
+        android:id="@+id/hotbuy_ImageText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/hotbuy_space"
+        android:layout_alignBottom="@+id/hotbuy_space"
+        android:layout_marginBottom="58dip"
+        android:layout_marginLeft="5dip"
+        android:textSize="14dip"
+        android:textStyle="bold"
+        android:text="@string/HOT_BUYS"
+        android:textColor="#0000FF" />
+
 
     <ImageView
         android:layout_width="150dp"
@@ -16,7 +34,21 @@
         android:layout_marginLeft="25dp"
         android:id="@+id/message_space"
         android:layout_below="@+id/hotbuy_space"
-        android:layout_alignParentLeft="true" />
+       android:layout_alignParentLeft="true">
+    </ImageView>
+
+    <TextView
+        android:id="@+id/message_imagetext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/message_space"
+        android:layout_alignBottom="@+id/message_space"
+        android:layout_marginBottom="27dip"
+        android:layout_marginLeft="7dip"
+        android:textSize="14dip"
+        android:textStyle="bold"
+        android:text="@string/MESSAGES"
+        android:textColor="#0000FF" />
 
     <ImageView
         android:layout_width="150dp"
@@ -24,7 +56,19 @@
         android:layout_marginRight="25dp"
         android:id="@+id/cal_space"
         android:layout_alignTop="@+id/message_space"
-        android:layout_alignParentRight="true"  />
+        android:layout_alignParentRight="true" />
+    <TextView
+        android:id="@+id/calender_imagetext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/cal_space"
+        android:layout_alignBottom="@+id/cal_space"
+        android:layout_marginBottom="27dip"
+        android:layout_marginLeft="7dip"
+        android:textSize="14dip"
+        android:textStyle="bold"
+        android:text="@string/CALENDAR"
+        android:textColor="#0000FF" />
 
     <Button
         android:layout_width="match_parent"

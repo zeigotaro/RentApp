@@ -20,6 +20,9 @@
     <string name="inbox">Inbox</string>
     <string name="id_param_name">ID</string>
     <string name="hot_buys">Hot Buys</string>
+    <string name="HOT_BUYS">HOT BUYS</string>
+    <string name="MESSAGES">MESSAGES</string>
+    <string name="CALENDAR">CALENDAR</string>
     <string name="open_hot_buys">Open Hot Buys</string>
     <string name="ending_soon">Hot Buys Ending Soon</string>
     <string name="create_order">CREATE ORDER</string>
