@@ -74,6 +74,8 @@ public class AccountMainActivity extends ActionBarActivity
     private ActionBar mActionBar = null;
     private final FragmentId[] myFragmentIdValues = FragmentId.values();
     private String mApiToken;
+    private int mCurrentItemId;
+    private FragmentId currentFragment = FragmentId.LOGOUT;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,13 +115,15 @@ public class AccountMainActivity extends ActionBarActivity
     public void changeToFragment(FragmentId fragmentId) {
         // update the main content by replacing fragments
         if(fragmentId != FragmentId.LOGOUT) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            if(fragmentManager != null) {
-                Fragment fragment = getFragmentInstance(fragmentId);
-                if(fragment != null) {
-                    fragmentManager.beginTransaction()
-                            .replace(R.id.container, fragment)
-                            .commit();
+            if(fragmentId != currentFragment) {
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                if(fragmentManager != null) {
+                    Fragment fragment = getFragmentInstance(fragmentId);
+                    if(fragment != null) {
+                        fragmentManager.beginTransaction()
+                                .replace(R.id.container, fragment)
+                                .commit();
+                    }
                 }
             }
         } else {
@@ -132,7 +136,7 @@ public class AccountMainActivity extends ActionBarActivity
     public void onSectionAttached(FragmentId fragmentId) {
         switch (fragmentId) {
             case HOME:
-                mTitle = getString(R.string.title_my_account);
+                mTitle = getString(R.string.title_dashboard);
                 break;
             case HOTBUYS:
                 mTitle = getString(R.string.title_hot_buys);
@@ -145,6 +149,9 @@ public class AccountMainActivity extends ActionBarActivity
                 break;
             case LOGOUT:
                 mTitle = getString(R.string.title_logout);
+                break;
+            default:
+                mTitle = "";
                 break;
         }
     }
@@ -220,11 +227,13 @@ public class AccountMainActivity extends ActionBarActivity
     private Fragment getFragmentInstance(FragmentId fragmentId)
     {
         Log.i("MAIN", "getFragInstance, id: " + Integer.toString(fragmentId.getValue()));
+        currentFragment = fragmentId;
         switch (fragmentId) {
             case HOME:       return HomeFragment.newInstance();
             case HOTBUYS:    return HotbuyListFragment.newInstance();
             case MESSAGES:   return InboxFragment.newInstance();
             case EVENTS:     return CalendarFragment.newInstance();
+            case HOTBUY_ITEM:     return HotbuyFragment.newInstance(mProductMap.get(mCurrentItemId));
             default:         return PlaceholderFragment.newInstance(fragmentId.getValue());
         }
     }
@@ -247,17 +256,14 @@ public class AccountMainActivity extends ActionBarActivity
 
     public void productItemSelected(int id) {
         Log.i("PRODUCT_SELECTED", Integer.toString(id));
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        if(fragmentManager != null) {
-            Product p = mProductMap.get(id);
-            Fragment fragment = HotbuyFragment.newInstance(p);
-            if(fragment != null) {
-                fragmentManager.beginTransaction()
-                        .replace(R.id.container, fragment)
-                        .commit();
-            }
-        }
+        mCurrentItemId = id;
+        changeToFragment(FragmentId.HOTBUY_ITEM);
+    }
 
+    @Override
+    public void onBackPressed() {
+        if(currentFragment != FragmentId.HOME)
+            changeToFragment(FragmentId.HOME);
     }
 
     /**

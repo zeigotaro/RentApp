@@ -13,6 +13,7 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
     <string name="dashboard">DASHBOARD</string>
+    <string name="title_dashboard">Dashboard</string>
     <string name="messages">Messages</string>
     <string name="products">Products</string>
     <string name="product">Product</string>

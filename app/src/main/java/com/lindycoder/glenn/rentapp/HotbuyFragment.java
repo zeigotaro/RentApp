@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +35,7 @@ import java.util.List;
 
 
 public class HotbuyFragment extends Fragment {
+    private static final FragmentId fragmentId = FragmentId.HOTBUY_ITEM;
 
     private static Product product;
     private View rootView;
@@ -73,15 +75,21 @@ public class HotbuyFragment extends Fragment {
             });
             String apiToken = ((AccountMainActivity) getActivity()).getAPIToken();
             new UserGetIndividualProduct(apiToken, product.getId(),holder.txtDescription).execute();
+            rootView.setFocusableInTouchMode(true);
+            rootView.requestFocus();
+            rootView.setOnKeyListener(new View.OnKeyListener() {
+                @Override
+                public boolean onKey(View v, int keyCode, KeyEvent event) {
+                    if( keyCode == KeyEvent.KEYCODE_BACK ) {
+                        ((AccountMainActivity) getActivity()).changeToFragment(FragmentId.HOTBUYS);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+            });
         }
         return rootView;
-    }
-
-    public void UpdateDescription(String s) {
-        if(rootView != null) {
-            ViewHolder holder = (ViewHolder) rootView.getTag();
-            holder.txtDescription.setText(s);
-        }
     }
 
         /*

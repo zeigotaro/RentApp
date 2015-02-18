@@ -91,9 +91,10 @@ public class ParseUtils {
                                                 jsonParseToInt(c, TAG_HOTBUY_MIN_QUANTITY)
                     );
 
-                    if(p.isExpired() != Boolean.TRUE) {
+                    //TODO: For production version, re-enable expiration check?
+                    //if(p.isExpired() != Boolean.TRUE) {
                         map.put(id, p);
-                    }
+                    //}
                 }
 
             } catch (JSONException e) {
