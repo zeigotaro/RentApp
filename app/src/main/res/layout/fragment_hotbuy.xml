@@ -4,32 +4,115 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <TextView
-        android:layout_width="250dip"
-        android:layout_height="50dp"
-        android:paddingLeft="30dip"
-        android:id="@+id/name_space" />
-    <TextView
-        android:layout_width="200dip"
-        android:layout_height="50dp"
-        android:id="@+id/price_space"
-        android:layout_toRightOf="@id/name_space"/>
-
+    <RelativeLayout
+        android:id="@+id/hotbuy_item_title_space"
+        android:layout_width="match_parent"
+        android:layout_height="50dip"
+        android:layout_marginTop="10dip">
+        <TextView
+            android:layout_width="130dip"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_centerInParent="true"
+            android:layout_gravity="start|center_vertical"
+            android:textColor="#FF0000"
+            android:text="$99999.99"
+            android:textSize="19dip"
+            android:id="@+id/price_space"
+            />
+        <TextView
+            android:layout_width="230dip"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:paddingRight="5dip"
+            android:gravity="end"
+            android:textColor="#0000FF"
+            android:textSize="19dip"
+            android:text="Test Test Test"
+            android:layout_toLeftOf="@id/price_space"
+            android:id="@+id/name_space" />
+    </RelativeLayout>
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="75dp"
+        android:layout_height="55dp"
+        android:textSize="10dip"
+        android:textAlignment="center"
+        android:text=""
+        android:textColor="#0000FF"
         android:paddingLeft="20dip"
         android:paddingRight="20dip"
+        android:ellipsize="end"
         android:id="@+id/item_description"
-        android:layout_below="@+id/name_space" />
+        android:layout_below="@+id/hotbuy_item_title_space" />
 
 
     <ImageView
-        android:layout_width="150dp"
+        android:layout_width="match_parent"
         android:layout_height="200dp"
+        android:layout_marginRight="25dip"
+        android:layout_marginLeft="25dip"
+        android:layout_centerInParent="true"
         android:id="@+id/image_space"
         android:layout_below="@+id/item_description" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerInParent="true"
+        android:layout_marginRight="50dip"
+        android:layout_gravity="start|center_vertical"
+        android:textColor="#FF0000"
+        android:text="0 hr, 0 min, 0 sec"
+        android:textSize="19dip"
+        android:id="@+id/offer_time_space"
+        android:layout_below="@+id/image_space" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:paddingRight="5dip"
+        android:gravity="end"
+        android:textColor="#0000FF"
+        android:textSize="19dip"
+        android:text="@string/offer_ends_in"
+        android:layout_toLeftOf="@id/offer_time_space"
+        android:layout_below="@+id/image_space"
+        android:id="@+id/offer_ends_space" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="5dip"
+        android:layout_marginBottom="5dip"
+        android:layout_gravity="start|center_vertical"
+        android:textColor="#000000"
+        android:text="@string/enter_unit_amount"
+        android:textStyle="bold"
+        android:textSize="19dip"
+        android:id="@+id/enter_unit_string_space"
+        android:layout_below="@+id/offer_ends_space" />
+    <FrameLayout
+        android:id="@+id/enter_unit_amount_space"
+        android:layout_width="90dp"
+        android:layout_height="35dip"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="5dip"
+        android:layout_weight="0.6"
+        android:padding="1dp"
+        android:layout_below="@+id/enter_unit_string_space"
+        android:background="@android:color/black" >
 
+        <EditText
+            android:id="@+id/editText_input"
+            android:background="#ffffff"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:numeric="integer"
+            android:imeOptions="actionDone"
+            android:layout_gravity="center_vertical" />
+    </FrameLayout>
     <Button
         android:layout_width="150dip"
         android:layout_height="50dp"
@@ -38,7 +121,7 @@
         android:id="@+id/order_button"
         android:background="@android:color/holo_red_dark"
         android:textColor="@android:color/white"
-        android:layout_below="@id/image_space"/>
+        android:layout_below="@id/enter_unit_amount_space"/>
 
 
 </RelativeLayout>

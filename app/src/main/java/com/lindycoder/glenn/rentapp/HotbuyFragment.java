@@ -12,7 +12,9 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -86,6 +88,20 @@ public class HotbuyFragment extends Fragment {
                     } else {
                         return false;
                     }
+                }
+            });
+
+            // get edittext component
+            EditText edittext = (EditText) rootView.findViewById(R.id.editText_input);
+
+            edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+
+                @Override
+                public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                    if (actionId == EditorInfo.IME_ACTION_DONE) {
+                        Log.i("EDIT_TEXT_LISTEN", "done action rec'd");
+                    }
+                    return false;
                 }
             });
         }

@@ -13,6 +13,8 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="action_example">Example action</string>
     <string name="dashboard">DASHBOARD</string>
+    <string name="offer_ends_in">OFFER ENDS IN: </string>
+    <string name="enter_unit_amount">Enter Unit Amount: </string>
     <string name="title_dashboard">Dashboard</string>
     <string name="messages">Messages</string>
     <string name="products">Products</string>
