@@ -334,18 +334,13 @@ public class AccountMainActivity extends ActionBarActivity
 
         private int fillList(String post_url, String param_name) {
             int retCount = 0;
-            HttpClient client = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost(post_url);
             // Building post parameters, key and value pair
             List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(1);
             nameValuePair.add(new BasicNameValuePair(getString(R.string.token_param_name), mApiToken));
             // Encode the POST parameters to URL format
-            try {
-                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-                HttpResponse response = client.execute(httpPost);
-                HttpEntity resEntity = response.getEntity();
-                if (resEntity != null) {
-                    JSONObject result = new JSONObject(EntityUtils.toString(resEntity));
+            JSONObject result = ParseUtils.getJSONResultFromPost(post_url, nameValuePair);
+            if(result != null) {
+                try {
                     String resultCode = result.getString(getString(R.string.result_param_name));
                     String resultMsg = result.getString(getString(R.string.message_param_name));
                     Log.i("RESULT_CODE", resultCode);
@@ -357,10 +352,9 @@ public class AccountMainActivity extends ActionBarActivity
                             mListMap.put(param_name, jArray);
                         }
                     }
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            } catch (IOException | JSONException e) {
-                // write exception to log
-                e.printStackTrace();
             }
             return retCount;
         }

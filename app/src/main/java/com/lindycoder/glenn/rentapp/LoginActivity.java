@@ -300,20 +300,14 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            // TODO: attempt authentication against a network service.
-            HttpClient client = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost(getString(R.string.http_login_post_url));
             // Building post parameters, key and value pair
             List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(2);
             nameValuePair.add(new BasicNameValuePair("Email", mEmail));
             nameValuePair.add(new BasicNameValuePair("Password", mPassword));
+            JSONObject result = ParseUtils.getJSONResultFromPost(getString(R.string.http_login_post_url), nameValuePair);
+            if (result != null) {
             // Encode the POST parameters to URL format
-            try {
-                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-                HttpResponse response = client.execute(httpPost);
-                HttpEntity resEntity = response.getEntity();
-                if (resEntity != null) {
-                    JSONObject result = new JSONObject(EntityUtils.toString(resEntity));
+                try {
                     String resultCode = result.getString(getString(R.string.result_param_name));
                     String resultMsg = result.getString(getString(R.string.message_param_name));
                     Log.i("RESULT_CODE", resultCode);
@@ -324,13 +318,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                         mToken = result.getString(getString(R.string.token_param_name));
                         Log.i("TOKEN", mToken);
                     }
+                } catch (JSONException e) {
+                    // write exception to log
+                    e.printStackTrace();
                 }
-            } catch (IOException | JSONException e) {
-                // write exception to log
-                e.printStackTrace();
             }
 
-            // TODO: register the new account here.
             return true;
         }
 

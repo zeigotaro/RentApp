@@ -42,29 +42,52 @@ public class HotbuyFragment extends Fragment {
     private static final FragmentId fragmentId = FragmentId.HOTBUY_ITEM;
 
     private static Product product;
-    private static String productName;
-    private static String price;
-    private static String quantityString;
+    private String productName;
+    private String price;
+    private String quantityString;
+    private String apiToken;
     private View rootView;
-    private static int currentUnitAmount = 0;
+    private int currentUnitAmount = 0;
+    private static HotbuyFragment currentInstance = null;
 
     public static HotbuyFragment newInstance(Product p) {
         HotbuyFragment fragment = new HotbuyFragment();
         product = p;
+        currentInstance = fragment;
         return fragment;
     }
 
     public HotbuyFragment() {
     }
 
-    public static String getDialogMsg() {
+    public String getDialogMsg() {
         String msgString = productName + "\n" +"$" + price + "\n\n" + quantityString;
         return msgString;
     }
 
-    public static int getCurrentUnitAmount() {
+    public int getCurrentUnitAmount() {
         return currentUnitAmount;
     }
+
+    public static HotbuyFragment getCurrentInstance() {
+        return currentInstance;
+    }
+
+    public void postBuyItem() {
+        new UserPostItemBuy(apiToken, product.getId(),currentUnitAmount).execute();
+    }
+
+    public void showResult(String result) {
+        new AlertDialog.Builder(getActivity(), AlertDialog.THEME_HOLO_LIGHT)
+                .setTitle(result)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        ((AccountMainActivity)getActivity()).changeToFragment(FragmentId.HOTBUYS);
+                    }
+                })
+                .show();
+    }
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -93,7 +116,7 @@ public class HotbuyFragment extends Fragment {
                     Log.i("ITEM_PAGE", "ORDER NOW clicked");
                 }
             });
-            String apiToken = ((AccountMainActivity) getActivity()).getAPIToken();
+            apiToken = ((AccountMainActivity) getActivity()).getAPIToken();
             new UserGetIndividualProduct(apiToken, product.getId(),holder.txtDescription).execute();
             rootView.setFocusableInTouchMode(true);
             rootView.requestFocus();
@@ -116,9 +139,11 @@ public class HotbuyFragment extends Fragment {
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                     if (actionId == EditorInfo.IME_ACTION_DONE) {
                         String amount = edittext.getText().toString();
-                        currentUnitAmount = Integer.parseInt(amount);
-                        quantityString = getString(R.string.quantity) + " " + amount;
-                        Log.i("EDIT_TEXT", "done action, int: " + Integer.toString(currentUnitAmount));
+                        if(!amount.isEmpty()) {
+                            currentUnitAmount = Integer.parseInt(amount);
+                            quantityString = getString(R.string.quantity) + " " + amount;
+                            Log.i("EDIT_TEXT", "done action, int: " + Integer.toString(currentUnitAmount));
+                        }
                     }
                     return false;
                 }
@@ -126,25 +151,29 @@ public class HotbuyFragment extends Fragment {
 
             Button orderButton = (Button) rootView.findViewById(R.id.order_button);
             orderButton.setOnClickListener(new Button.OnClickListener() {
-               public void onClick(View view) {
-                   if(HotbuyFragment.getCurrentUnitAmount() > 0) {
-                   new AlertDialog.Builder(getActivity(), AlertDialog.THEME_HOLO_LIGHT)
-                           .setTitle(R.string.dialog_confirm_order)
-                           .setMessage(HotbuyFragment.getDialogMsg())
-                           .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
-                               public void onClick(DialogInterface dialog, int which) {
-                                   // place order
-                               }
-                           })
-                           .setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
-                               public void onClick(DialogInterface dialog, int which) {
-                                   // cancel, exit dialog
-                               }
-                           })
-                           .setIcon(android.R.drawable.ic_dialog_alert)
-                           .show();
-                   }
-               }
+                public void onClick(View view) {
+                    final HotbuyFragment hbInstance = HotbuyFragment.getCurrentInstance();
+                    if(hbInstance != null)
+                    {
+                        if (hbInstance.getCurrentUnitAmount() > 0) {
+                            new AlertDialog.Builder(getActivity(), AlertDialog.THEME_HOLO_LIGHT)
+                                    .setTitle(R.string.dialog_confirm_order)
+                                    .setMessage(hbInstance.getDialogMsg())
+                                    .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // place order
+                                            hbInstance.postBuyItem();
+                                        }
+                                    })
+                                    .setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            // cancel, exit dialog
+                                        }
+                                    })
+                                    .show();
+                        }
+                    }
+                }
             });
         }
         return rootView;
@@ -184,28 +213,21 @@ public class HotbuyFragment extends Fragment {
 
         @Override
         protected Boolean doInBackground(Void... params) {
-            HttpClient client = new DefaultHttpClient();
-            HttpPost httpPost = new HttpPost(getString(R.string.http_hot_buy_post_url));
             // Building post parameters, key and value pair
             List<NameValuePair> nameValuePair = new ArrayList<>(2);
             nameValuePair.add(new BasicNameValuePair(getString(R.string.token_param_name), mApiToken));
             nameValuePair.add(new BasicNameValuePair(getString(R.string.id_param_name), Integer.toString(mId)));
-            try {
-                httpPost.setEntity(new UrlEncodedFormEntity(nameValuePair));
-                HttpResponse response = client.execute(httpPost);
-                HttpEntity resEntity = response.getEntity();
-                if (resEntity != null) {
-                    JSONObject result = new JSONObject(EntityUtils.toString(resEntity));
-                    JSONObject jProduct = ParseUtils.parseResultToObject(result, getString(R.string.product));
-                    if(jProduct != null) {
-                        Log.i("PRODUCT_DETAIL", jProduct.toString());
+            JSONObject result = ParseUtils.getJSONResultFromPost(getString(R.string.http_hot_buy_post_url), nameValuePair);
+            if(result != null) {
+                JSONObject jProduct = ParseUtils.parseResultToObject(result, getString(R.string.product));
+                if(jProduct != null) {
+                    Log.i("PRODUCT_DETAIL", jProduct.toString());
+                    try {
                         description = jProduct.getString(getString(R.string.description_param_name));
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-
                 }
-            } catch (IOException | JSONException e) {
-                // write exception to log
-                e.printStackTrace();
             }
             return true;
         }
@@ -217,6 +239,37 @@ public class HotbuyFragment extends Fragment {
                     textView.setText(description);
                 }
             }
+        }
+    }
+
+    public class UserPostItemBuy extends AsyncTask<Void, Void, Boolean> {
+
+        private final String mApiToken;
+        private final int mId;
+        private final int mQuantity;
+
+        UserPostItemBuy (String apiToken, int id, int quantity) {
+            mApiToken = apiToken;
+            mId = id;
+            mQuantity = quantity;
+        }
+
+        @Override
+        protected Boolean doInBackground(Void... params) {
+            List<NameValuePair> nameValuePair = new ArrayList<>(3);
+            nameValuePair.add(new BasicNameValuePair(getString(R.string.token_param_name), mApiToken));
+            nameValuePair.add(new BasicNameValuePair(getString(R.string.id_param_name), Integer.toString(mId)));
+            nameValuePair.add(new BasicNameValuePair(getString(R.string.quantity_param_name), Integer.toString(mQuantity)));
+            JSONObject result = ParseUtils.getJSONResultFromPost(getString(R.string.buy_item_post_url), nameValuePair);
+            if(result != null) {
+                return ParseUtils.testPostResult(result);
+            }
+            return false;
+        }
+
+        protected void onPostExecute(Boolean b) {
+            String postResult = b ? "Order placed successfully" : "Order attempt failed";
+            showResult(postResult);
         }
     }
 }

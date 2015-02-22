@@ -2,15 +2,25 @@ package com.lindycoder.glenn.rentapp;
 
 import android.util.Log;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TimeZone;
 
 public class ParseUtils {
@@ -50,20 +60,47 @@ public class ParseUtils {
         return retCal;
     }
 
+    public static JSONObject getJSONResultFromPost(String postUrl, List<NameValuePair> postParams) {
+        HttpClient client = new DefaultHttpClient();
+        HttpPost httpPost = new HttpPost(postUrl);
+        try {
+            httpPost.setEntity(new UrlEncodedFormEntity(postParams));
+            HttpResponse response = client.execute(httpPost);
+            HttpEntity resEntity = response.getEntity();
+            if (resEntity != null) {
+                JSONObject result = new JSONObject(EntityUtils.toString(resEntity));
+                return result;
+            }
+        } catch (IOException | JSONException e) {
+            // write exception to log
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static JSONObject parseResultToObject(JSONObject j, String tag) {
         JSONObject ret = null;
         try {
-            String resultCode = j.getString(TAG_RESULT_PARAM);
-            String resultMsg = j.getString(TAG_MESSAGE_PARAM);
-            Log.i("RESULT_CODE", resultCode);
-            Log.i("RESULT_MSG", resultMsg);
-            if ((resultCode != null) && resultCode.equals(TAG_POST_SUCCESS)) {
-                    ret = j.getJSONObject(tag);
+            if(testPostResult(j)) {
+                ret = j.getJSONObject(tag);
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return ret;
+    }
+
+    public static boolean testPostResult(JSONObject j) {
+        try {
+            String resultCode = j.getString(TAG_RESULT_PARAM);
+            String resultMsg = j.getString(TAG_MESSAGE_PARAM);
+            Log.i("RESULT_MSG", resultMsg);
+            Log.i("RESULT_CODE", resultCode);
+            return ((resultCode != null) && resultCode.equals(TAG_POST_SUCCESS));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public static HashMap<Integer, Product> parseProductMapFromJSON(JSONArray jArray) {

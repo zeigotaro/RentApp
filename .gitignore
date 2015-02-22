@@ -6,3 +6,5 @@
 /build
 app/src/main/res/values/client_info.xml
 app/build.gradle~
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/inspectionProfiles/Project_Default.xml
