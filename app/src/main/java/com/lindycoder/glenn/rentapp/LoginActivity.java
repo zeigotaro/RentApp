@@ -8,6 +8,7 @@ import android.app.LoaderManager.LoaderCallbacks;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -65,8 +66,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
     private AutoCompleteTextView mEmailView;
     private EditText mPasswordView;
     private View mProgressView;
-    //private View mEmailLoginFormView;
-    //private View mSignOutButtons;
     private View mLoginFormView;
     public final static String API_TOKEN = "com.lindycoder.glenn.rentapp.MESSAGE";
 
@@ -101,7 +100,20 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
-        //mEmailLoginFormView = findViewById(R.id.email_login_form);
+
+        Intent intent = getIntent();
+        boolean bUseSharedPrefs = intent.getBooleanExtra(AccountMainActivity.LOGOUT_TOKEN, true);
+        if(bUseSharedPrefs) {
+            SharedPreferences shared = getSharedPreferences("shared", MODE_PRIVATE);
+            if(shared.contains("username") && shared.contains("password")){
+                String username = shared.getString("username", null);
+                String password = shared.getString("password", null);
+                if((username != null) && (password != null)) {
+                    mAuthTask = new UserLoginTask(username, password);
+                    mAuthTask.execute((Void) null);
+                }
+            }
+        }
     }
 
     private void populateAutoComplete() {
@@ -270,7 +282,6 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         startActivity(intent);
     }
 
-
     /**
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
@@ -279,10 +290,12 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
 
         private final String mEmail;
         private final String mPassword;
+        private String mToken;
 
         UserLoginTask(String email, String password) {
             mEmail = email;
             mPassword = password;
+            mToken = null;
         }
 
         @Override
@@ -307,9 +320,9 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
                     Log.i("RESULT_MSG", resultMsg);
                     if ((resultCode != null) && resultCode.equals(getString(R.string.post_success)))
                     {
-                        String token = result.getString(getString(R.string.token_param_name));
-                        Log.i("TOKEN", token);
-                        onLoginSuccess(token);
+                        saveInformation();
+                        mToken = result.getString(getString(R.string.token_param_name));
+                        Log.i("TOKEN", mToken);
                     }
                 }
             } catch (IOException | JSONException e) {
@@ -321,12 +334,21 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             return true;
         }
 
+        private void saveInformation() {
+            SharedPreferences shared = getSharedPreferences("shared", MODE_PRIVATE);
+            SharedPreferences.Editor editor = shared.edit();
+            editor.putString("username", mEmail);
+            editor.putString("password", mPassword);
+            editor.commit();
+        }
+
         @Override
         protected void onPostExecute(final Boolean success) {
             mAuthTask = null;
             showProgress(false);
 
             if (success) {
+                onLoginSuccess(mToken);
                 finish();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));

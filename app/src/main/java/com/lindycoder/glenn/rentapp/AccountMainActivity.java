@@ -76,6 +76,8 @@ public class AccountMainActivity extends ActionBarActivity
     private String mApiToken;
     private int mCurrentItemId;
     private FragmentId currentFragment = FragmentId.LOGOUT;
+    public final static String LOGOUT_TOKEN = "com.lindycoder.glenn.rentapp.LOGOUT";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,6 +131,7 @@ public class AccountMainActivity extends ActionBarActivity
         } else {
             //Logout of app
             Intent intent = new Intent(this, LoginActivity.class);
+            intent.putExtra(LOGOUT_TOKEN, false);
             startActivity(intent);
         }
     }
