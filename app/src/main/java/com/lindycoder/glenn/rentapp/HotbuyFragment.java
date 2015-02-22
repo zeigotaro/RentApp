@@ -1,6 +1,8 @@
 package com.lindycoder.glenn.rentapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -40,7 +42,12 @@ public class HotbuyFragment extends Fragment {
     private static final FragmentId fragmentId = FragmentId.HOTBUY_ITEM;
 
     private static Product product;
+    private static String productName;
+    private static String price;
+    private static String quantityString;
     private View rootView;
+    private static int currentUnitAmount = 0;
+
     public static HotbuyFragment newInstance(Product p) {
         HotbuyFragment fragment = new HotbuyFragment();
         product = p;
@@ -48,6 +55,15 @@ public class HotbuyFragment extends Fragment {
     }
 
     public HotbuyFragment() {
+    }
+
+    public static String getDialogMsg() {
+        String msgString = productName + "\n" +"$" + price + "\n\n" + quantityString;
+        return msgString;
+    }
+
+    public static int getCurrentUnitAmount() {
+        return currentUnitAmount;
     }
 
     @Override
@@ -67,8 +83,10 @@ public class HotbuyFragment extends Fragment {
 
         if(rootView != null) {
             ViewHolder holder = (ViewHolder) rootView.getTag();
-            holder.txtName.setText(product.getName());
-            holder.txtPrice.setText(Double.toString(product.getPrice()));
+            productName = product.getName();
+            price = Double.toString(product.getPrice());
+            holder.txtName.setText(productName);
+            holder.txtPrice.setText(price);
             holder.btnOrderNow.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -92,17 +110,41 @@ public class HotbuyFragment extends Fragment {
             });
 
             // get edittext component
-            EditText edittext = (EditText) rootView.findViewById(R.id.editText_input);
+            final EditText edittext = (EditText) rootView.findViewById(R.id.editText_input);
 
             edittext.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-
-                @Override
                 public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                     if (actionId == EditorInfo.IME_ACTION_DONE) {
-                        Log.i("EDIT_TEXT_LISTEN", "done action rec'd");
+                        String amount = edittext.getText().toString();
+                        currentUnitAmount = Integer.parseInt(amount);
+                        quantityString = getString(R.string.quantity) + " " + amount;
+                        Log.i("EDIT_TEXT", "done action, int: " + Integer.toString(currentUnitAmount));
                     }
                     return false;
                 }
+            });
+
+            Button orderButton = (Button) rootView.findViewById(R.id.order_button);
+            orderButton.setOnClickListener(new Button.OnClickListener() {
+               public void onClick(View view) {
+                   if(HotbuyFragment.getCurrentUnitAmount() > 0) {
+                   new AlertDialog.Builder(getActivity(), AlertDialog.THEME_HOLO_LIGHT)
+                           .setTitle(R.string.dialog_confirm_order)
+                           .setMessage(HotbuyFragment.getDialogMsg())
+                           .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                               public void onClick(DialogInterface dialog, int which) {
+                                   // place order
+                               }
+                           })
+                           .setNegativeButton(R.string.back, new DialogInterface.OnClickListener() {
+                               public void onClick(DialogInterface dialog, int which) {
+                                   // cancel, exit dialog
+                               }
+                           })
+                           .setIcon(android.R.drawable.ic_dialog_alert)
+                           .show();
+                   }
+               }
             });
         }
         return rootView;
