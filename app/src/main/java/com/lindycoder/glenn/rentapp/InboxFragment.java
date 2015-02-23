@@ -1,20 +1,25 @@
 package com.lindycoder.glenn.rentapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
@@ -58,7 +63,7 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
         inboxList = new ArrayList<>();
 
         // Loading INBOX in Background Thread
-        new LoadInbox(rootView.getContext()).execute();
+        new LoadInbox(rootView.getContext(),(ListView)rootView.findViewById(android.R.id.list)).execute();
         return rootView;
     }
 
@@ -72,11 +77,13 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
      * Background Async Task to Load all INBOX messages
      */
     private class LoadInbox extends AsyncTask<String, String, String> {
+        private final WeakReference<ListView> listViewReference;
 
         private Context mContext;
 
-        public LoadInbox(Context context) {
+        public LoadInbox(Context context, ListView listView) {
             mContext = context;
+            listViewReference = new WeakReference<>(listView);
         }
 
         /**
@@ -117,6 +124,11 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                 e.printStackTrace();
             }
 
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String string) {
             getActivity().runOnUiThread(new Runnable() {
                 public void run() {
                     /**
@@ -133,7 +145,24 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
                 }
             });
 
-            return null;
+            if (listViewReference != null) {
+                final ListView listView = listViewReference.get();
+                if (listView != null) {
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            HashMap<String, String> itemMap = (HashMap<String, String>)listView.getItemAtPosition(position);
+                            new AlertDialog.Builder(getActivity(), AlertDialog.THEME_HOLO_LIGHT)
+                                    .setTitle(itemMap.get(TAG_TITLE))
+                                    .setMessage(itemMap.get(TAG_TEXT))
+                                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                        public void onClick(DialogInterface dialog, int which) {
+                                        }
+                                    })
+                                    .show();
+                        }
+                    });
+                }
+            }
         }
 
         private String parseDate(String inDate, String timeZone) {

@@ -37,14 +37,6 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".HotBuyActivity"
-            android:label="@string/title_activity_hot_buy"
-            android:parentActivityName=".LoginActivity" >
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.lindycoder.glenn.rentapp.LoginActivity" />
-        </activity>
-        <activity
             android:name=".AccountMainActivity"
             android:label="@string/title_activity_account_main"
             android:parentActivityName=".LoginActivity" >

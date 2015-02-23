@@ -18,7 +18,7 @@
             android:layout_gravity="start|center_vertical"
             android:textColor="#FF0000"
             android:text="$99999.99"
-            android:textSize="19dip"
+            android:textSize="18dip"
             android:id="@+id/price_space"
             />
         <TextView
@@ -28,14 +28,14 @@
             android:paddingRight="5dip"
             android:gravity="end"
             android:textColor="#0000FF"
-            android:textSize="19dip"
+            android:textSize="18dip"
             android:text="Test Test Test"
             android:layout_toLeftOf="@id/price_space"
             android:id="@+id/name_space" />
     </RelativeLayout>
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="55dp"
+        android:layout_height="30dp"
         android:textSize="10dip"
         android:textAlignment="center"
         android:text=""
