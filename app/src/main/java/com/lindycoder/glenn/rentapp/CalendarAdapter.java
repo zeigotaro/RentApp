@@ -9,7 +9,9 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.TimeZone;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -92,8 +94,23 @@ public class CalendarAdapter extends BaseAdapter{
 
             int day = d.getDay();
             if(eventMap.containsKey(day) && (eventMap.get(day).getDay().getYear() == d.getYear())){
-                Log.i("EVENT_MAP_LAYOUT", "Event found, day: " + Integer.toString(d.getDay()));
+                final Event event = eventMap.get(day);
+                Log.i("EVENT_MAP_LAYOUT", "Event found, title: " + event.getTitle() + "; des: " + event.getDescription());
                 event_layout.setVisibility(View.VISIBLE);
+                event_layout.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view){
+                        new AlertDialog.Builder(context, AlertDialog.THEME_HOLO_LIGHT)
+                                .setTitle(event.getTitle())
+                                .setMessage(event.getDescription())
+                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                    }
+                                })
+                                .show();
+
+                    }
+                });
             }else{
                 event_layout.setVisibility(View.GONE);
             }
@@ -107,7 +124,7 @@ public class CalendarAdapter extends BaseAdapter{
 			dayTV.setVisibility(View.VISIBLE);
 			relativeLayout.setVisibility(View.VISIBLE);
 
-			if(d.getDay() == 0){
+			if(day == 0){
 				relativeLayout.setVisibility(View.GONE);
 			}else{
 				dayTV.setVisibility(View.VISIBLE);

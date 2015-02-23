@@ -9,7 +9,7 @@ import android.graphics.Bitmap;
 public class Event {
 	
 	private int color;
-	private String name;
+	private String title;
 	private String description;
 	private String location;
 	private Bitmap image;
@@ -23,8 +23,10 @@ public class Event {
 	public static final int COLOR_PURPLE = 4;
 	public static final int COLOR_GREEN = 5;
 	
-	public Event(String eventID, Day day){
+	public Event(String eventID, String title, String description, Day day){
 		this.eventId = eventID;
+        this.title = title;
+        this.description = description;
 		this.day = day;
 	}
 	
@@ -42,7 +44,7 @@ public class Event {
 	 * @return title
 	 */
 	public String getTitle(){
-		return name;
+		return title;
 	}
 	
 	/**
@@ -72,12 +74,12 @@ public class Event {
 	}
 	
 	/**
-	 * Set the name of the event
+	 * Set the title of the event
 	 * 
-	 * @param name
+	 * @param title
 	 */
-	public void setName(String name){
-		this.name = name;
+	public void setTitle(String title){
+		this.title = title;
 	}
 	
 	/**

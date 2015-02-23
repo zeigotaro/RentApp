@@ -18,9 +18,6 @@ import org.json.JSONObject;
 
 public class CalendarFragment extends Fragment {
     private static final FragmentId fragmentId = FragmentId.EVENTS;
-    private EventCalendarView calendarView;
-    private int yr, mon, dy;
-    private Calendar selectedDate;
 
     private static final String TAG_ID = "ID";
     private static final String TAG_TITLE = "Title";
@@ -50,43 +47,11 @@ public class CalendarFragment extends Fragment {
 
         ((AccountMainActivity) getActivity()).setActionBarTitle(getString(R.string.calendar));
         Calendar c = Calendar.getInstance();
-        yr = c.get(Calendar.YEAR);
-        mon = c.get(Calendar.MONTH);
-        dy = c.get(Calendar.DAY_OF_MONTH);
         EventCalendarView calendar = (EventCalendarView) rootView.findViewById(R.id.calendar_view);
 
         calendar.setMonthEventMap(monthEventMap);
         calendar.refreshCalendar();
 
-/*
-        calendar.setOnDayClickListener( new EventCalendarView.OnDayClickListener() {
-            @Override
-            public void onDayClicked(AdapterView<?> adapter, View view, int position, long id, Day day) {
-                for(int i = 0; i < eventDates.length; i++){
-                    if( ( eventDates[i][0] <= day.getYear() && day.getYear() <= eventDates[i][3] ) &&
-                            ( eventDates[i][1] <= day.getMonth()+1 && day.getMonth()+1 <= eventDates[i][4] ) &&
-                            ( eventDates[i][2] <= day.getDay() && day.getDay() <= eventDates[i][5]) ){
-                        Bundle bund = new Bundle();
-                        bund.putInt("year", eventDates[i][0]);
-                        bund.putInt("month", eventDates[i][1]);
-                        bund.putInt("day", eventDates[i][2]);
-                        Intent intent = new Intent(view.getContext(), ListEventActivity.class);
-                        intent.putExtras(bund);
-                        startActivity(intent);
-                    }
-                }
-            }
-        });
-        calendarView.setOnDateChangeListener(new
-             OnDateChangeListener() {
-                 @Override
-                 public void onSelectedDayChange(CalendarView view,
-                                                 int year, int month, int dayOfMonth) {
-                     //Toast.makeText(getActivity().getApplicationContext(),"Selected date is "+(month+1)+"-"+dayOfMonth+"-"+
-                     //        year, Toast.LENGTH_SHORT). show();
-                 }
-         });
-         */
         return rootView;
     }
 
@@ -116,7 +81,7 @@ public class CalendarFragment extends Fragment {
                     int month = cal.get(Calendar.MONTH);
                     int day = cal.get(Calendar.DAY_OF_MONTH);
                     int year = cal.get(Calendar.YEAR);
-                    Event event = new Event(id, new Day(day, month, year));
+                    Event event = new Event(id, title, description, new Day(day, month, year));
                     if(!retMap.containsKey(month)) {
                         HashMap<Integer, Event> map = new HashMap<>();
                         map.put(day, event);
