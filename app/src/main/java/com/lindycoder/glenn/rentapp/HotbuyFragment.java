@@ -98,6 +98,7 @@ public class HotbuyFragment extends Fragment {
             holder.txtName = (TextView) rootView.findViewById(R.id.name_space);
             holder.txtPrice = (TextView) rootView.findViewById(R.id.price_space);
             holder.txtDescription = (TextView) rootView.findViewById(R.id.item_description);
+            holder.txtExpirationTime = (TextView) rootView.findViewById(R.id.offer_time_space);
             holder.btnOrderNow = (Button) rootView.findViewById(R.id.order_button);
             rootView.setTag(holder);
         }
@@ -110,12 +111,7 @@ public class HotbuyFragment extends Fragment {
             price = Double.toString(product.getPrice());
             holder.txtName.setText(productName);
             holder.txtPrice.setText(price);
-            holder.btnOrderNow.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.i("ITEM_PAGE", "ORDER NOW clicked");
-                }
-            });
+            holder.txtExpirationTime.setText(product.getTimeRemainingString(getString(R.string.sold_out)));
             apiToken = ((AccountMainActivity) getActivity()).getAPIToken();
             new UserGetIndividualProduct(apiToken, product.getId(),holder.txtDescription).execute();
             rootView.setFocusableInTouchMode(true);
@@ -149,8 +145,7 @@ public class HotbuyFragment extends Fragment {
                 }
             });
 
-            Button orderButton = (Button) rootView.findViewById(R.id.order_button);
-            orderButton.setOnClickListener(new Button.OnClickListener() {
+            holder.btnOrderNow.setOnClickListener(new Button.OnClickListener() {
                 public void onClick(View view) {
                     final HotbuyFragment hbInstance = HotbuyFragment.getCurrentInstance();
                     if(hbInstance != null)
@@ -189,6 +184,7 @@ public class HotbuyFragment extends Fragment {
         TextView txtName;
         TextView txtPrice;
         TextView txtDescription;
+        TextView txtExpirationTime;
         ImageView imgPreview;
         Button btnOrderNow;
     }

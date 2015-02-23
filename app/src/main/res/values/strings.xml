@@ -32,6 +32,7 @@
     <string name="ending_soon">Hot Buys Ending Soon</string>
     <string name="create_order">CREATE ORDER</string>
     <string name="dialog_confirm_order">Confirm Your Order</string>
+    <string name="sold_out">OFFER EXPIRED</string>
     <string name="confirm">Confirm</string>
     <string name="back">Back</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>

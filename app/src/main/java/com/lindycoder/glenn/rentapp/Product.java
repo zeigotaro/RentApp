@@ -63,6 +63,24 @@ public class Product {
         return bIsExpired;
 	}
 
+    public String getTimeRemainingString(String defaultString) {
+        if(!isExpired()) {
+            final int secInMs = 1000;
+            final int minInMs = 60 * secInMs;
+            final int hourInMs = 60 * minInMs;
+            long diff = endTime.getTimeInMillis() - today.getTimeInMillis();
+            int dhours = (int)(diff / hourInMs);
+            int dmin = (int)( (diff % hourInMs ) / minInMs );
+            int dsec = (int)( (diff % minInMs) / secInMs );
+            String hours = Integer.toString(dhours);
+            String minutes = Integer.toString(dmin);
+            String seconds = Integer.toString(dsec);
+            return hours + " hr, " + minutes + " min, " + seconds + " sec";
+        } else {
+            return defaultString;
+        }
+    }
+
     public boolean isSoldOut(){
         return (quantity > ordered);
     }
