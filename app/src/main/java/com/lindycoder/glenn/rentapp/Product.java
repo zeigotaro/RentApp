@@ -3,6 +3,7 @@ package com.lindycoder.glenn.rentapp;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -12,7 +13,7 @@ public class Product {
 	private String name;
 	private String description;
 	private double price;
-	private List<Bitmap> imageList;
+	private List<String> urlList;
 	private int quantity;
     private int ordered;
     private int minPurchaseQuantity;
@@ -39,7 +40,8 @@ public class Product {
                    int ordered,
                    int minPurchaseQuantity,
                    int maxPurchaseQuantity,
-                   int hotbuyMinQuantity
+                   int hotbuyMinQuantity,
+                   List<String> urlList
                    ){
 		this.id = id;
 		this.name = name;
@@ -52,11 +54,21 @@ public class Product {
         this.minPurchaseQuantity = minPurchaseQuantity;
         this.maxPurchaseQuantity = maxPurchaseQuantity;
         this.hotbuyMinQuantity = hotbuyMinQuantity;
+        this.urlList = urlList;
 	}
 	
-	public void setImageList(List<Bitmap> list){
-		this.imageList = list;
+	public void setUrlList(List<String> list){
+		this.urlList = list;
 	}
+
+    public String getPreviewUrl() {
+        String url = null;
+        if(!urlList.isEmpty())
+        {
+            url = urlList.get(0);
+        }
+        return url;
+    }
 	
 	public boolean isExpired(){
         boolean bIsExpired = (today.getTimeInMillis() > endTime.getTimeInMillis());

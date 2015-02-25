@@ -17,6 +17,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -115,6 +116,12 @@ public class ParseUtils {
                     JSONObject added_jObj = c.getJSONObject(TAG_DATE_ADDED);
                     Calendar date_added = ParseUtils.parseCalFromJSON(added_jObj.getString(TAG_DATE), added_jObj.getString(TAG_TIMEZONE));
                     int id = Integer.parseInt(c.getString(TAG_ID));
+                    JSONArray urls = c.getJSONArray(TAG_IMAGES);
+                    ArrayList<String> parsedUrls = new ArrayList<>();
+                    for(int j=0;j<urls.length();j++)
+                    {
+                        parsedUrls.add(urls.getString(j)); // item at index j
+                    }
                     Product p = new Product(    id,
                                                 c.getString(TAG_NAME),
                                                 "",
@@ -125,7 +132,8 @@ public class ParseUtils {
                                                 jsonParseToInt(c, TAG_ORDERED),
                                                 jsonParseToInt(c, TAG_MIN_QUANTITY),
                                                 jsonParseToInt(c, TAG_MAX_QUANTITY),
-                                                jsonParseToInt(c, TAG_HOTBUY_MIN_QUANTITY)
+                                                jsonParseToInt(c, TAG_HOTBUY_MIN_QUANTITY),
+                                                parsedUrls
                     );
 
                     //TODO: For production version, re-enable expiration check?

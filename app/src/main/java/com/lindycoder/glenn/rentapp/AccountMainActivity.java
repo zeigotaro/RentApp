@@ -1,7 +1,6 @@
 package com.lindycoder.glenn.rentapp;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -50,7 +49,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
-import android.text.format.DateUtils;
+
+import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
 
 public class AccountMainActivity extends ActionBarActivity
@@ -102,6 +105,16 @@ public class AccountMainActivity extends ActionBarActivity
                 R.id.navigation_drawer,
                 drawerLayout);
 
+        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(this)
+                .threadPriority(Thread.NORM_PRIORITY - 2)
+                .denyCacheImageMultipleSizesInMemory()
+                .diskCacheFileNameGenerator(new Md5FileNameGenerator())
+                .diskCacheSize(50 * 1024 * 1024) // 50 Mb
+                .tasksProcessingOrder(QueueProcessingType.LIFO)
+                .writeDebugLogs() // Remove for release app
+                .build();
+        // Initialize ImageLoader with configuration.
+        ImageLoader.getInstance().init(config);
         // Get the message from the intent
         Intent intent = getIntent();
         mApiToken = intent.getStringExtra(LoginActivity.API_TOKEN);
