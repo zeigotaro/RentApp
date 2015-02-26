@@ -30,6 +30,9 @@ import android.widget.TextView;
 
 import android.app.Activity;
 
+import com.parse.ParseInstallation;
+import com.parse.ParseUser;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -275,8 +278,13 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
         mEmailView.setAdapter(adapter);
     }
 
-    private void onLoginSuccess(String apiToken)
+    private void onLoginSuccess(String apiToken, String email)
     {
+        //Add user to parse to enable push notifications
+        ParseInstallation installation = ParseInstallation.getCurrentInstallation();
+        installation.put("username", email);
+        installation.saveInBackground();
+
         Intent intent = new Intent(this, AccountMainActivity.class);
         intent.putExtra(API_TOKEN, apiToken);
         startActivity(intent);
@@ -341,7 +349,7 @@ public class LoginActivity extends Activity implements LoaderCallbacks<Cursor> {
             showProgress(false);
 
             if (success) {
-                onLoginSuccess(mToken);
+                onLoginSuccess(mToken, mEmail);
                 finish();
             } else {
                 mPasswordView.setError(getString(R.string.error_incorrect_password));
