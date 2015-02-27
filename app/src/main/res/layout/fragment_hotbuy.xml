@@ -35,7 +35,7 @@
     </RelativeLayout>
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="25dp"
         android:textSize="10dip"
         android:textAlignment="center"
         android:text=""
@@ -49,7 +49,7 @@
 
     <ImageView
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="175dp"
         android:layout_marginRight="25dip"
         android:layout_marginLeft="25dip"
         android:layout_centerInParent="true"
@@ -116,12 +116,60 @@
     <Button
         android:layout_width="150dip"
         android:layout_height="50dp"
+        android:layout_marginTop="15dip"
         android:layout_centerInParent="true"
         android:text="@string/create_order"
         android:id="@+id/order_button"
         android:background="@android:color/holo_red_dark"
         android:textColor="@android:color/white"
         android:layout_below="@id/enter_unit_amount_space"/>
-
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="25dip"
+        android:layout_marginBottom="5dip"
+        android:layout_gravity="start|center_vertical"
+        android:textColor="#000000"
+        android:text="@string/amount_required"
+        android:textSize="17dip"
+        android:id="@+id/amount_required_space"
+        android:layout_below="@+id/order_button" />
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="3dip"
+        android:layout_marginBottom="5dip"
+        android:layout_gravity="start|center_vertical"
+        android:textColor="@color/material_blue_grey_900"
+        android:text="@string/minimum_not_reached"
+        android:textSize="15dip"
+        android:id="@+id/minimum_not_reached_space"
+        android:layout_below="@+id/amount_required_space" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dip"
+        android:layout_marginTop="20dip"
+        android:layout_marginBottom="5dip"
+        android:layout_below="@+id/minimum_not_reached_space" >
+        <TextView
+            android:layout_width="180dip"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000"
+            android:text="@string/requested"
+            android:textSize="17dip"
+            android:id="@+id/requested_space" />
+        <TextView
+            android:layout_width="180dip"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical|center_horizontal"
+            android:textColor="#000000"
+            android:text="@string/available"
+            android:textSize="17dip"
+            android:id="@+id/available_space"
+            android:layout_toRightOf="@+id/requested_space" />
+    </RelativeLayout>
 
 </RelativeLayout>

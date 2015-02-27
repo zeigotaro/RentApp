@@ -31,6 +31,10 @@
     <string name="open_hot_buys">Open Hot Buys</string>
     <string name="ending_soon">Hot Buys Ending Soon</string>
     <string name="create_order">CREATE ORDER</string>
+    <string name="amount_required">UNITS REQUIRED TO REACH BUY: </string>
+    <string name="minimum_not_reached">Minimum not yet reached</string>
+    <string name="requested">Requested: </string>
+    <string name="available">Available: </string>
     <string name="dialog_confirm_order">Confirm Your Order</string>
     <string name="sold_out">OFFER EXPIRED</string>
     <string name="confirm">Confirm</string>
