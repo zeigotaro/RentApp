@@ -7,8 +7,8 @@
     <RelativeLayout
         android:id="@+id/hotbuy_item_title_space"
         android:layout_width="match_parent"
-        android:layout_height="50dip"
-        android:layout_marginTop="10dip">
+        android:layout_height="46dip"
+        android:layout_marginTop="5dip">
         <TextView
             android:layout_width="130dip"
             android:layout_height="wrap_content"
@@ -48,8 +48,8 @@
 
 
     <ImageView
-        android:layout_width="match_parent"
-        android:layout_height="175dp"
+        android:layout_width="150dip"
+        android:layout_height="125dip"
         android:layout_marginRight="25dip"
         android:layout_marginLeft="25dip"
         android:layout_centerInParent="true"
@@ -116,7 +116,7 @@
     <Button
         android:layout_width="150dip"
         android:layout_height="50dp"
-        android:layout_marginTop="15dip"
+        android:layout_marginTop="10dip"
         android:layout_centerInParent="true"
         android:text="@string/create_order"
         android:id="@+id/order_button"
@@ -127,7 +127,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_marginTop="25dip"
+        android:layout_marginTop="15dip"
         android:layout_marginBottom="5dip"
         android:layout_gravity="start|center_vertical"
         android:textColor="#000000"
@@ -139,7 +139,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        android:layout_marginTop="3dip"
+        android:layout_marginTop="2dip"
         android:layout_marginBottom="5dip"
         android:layout_gravity="start|center_vertical"
         android:textColor="@color/material_blue_grey_900"
@@ -150,7 +150,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="40dip"
-        android:layout_marginTop="20dip"
+        android:layout_marginTop="10dip"
         android:layout_marginBottom="5dip"
         android:layout_below="@+id/minimum_not_reached_space" >
         <TextView

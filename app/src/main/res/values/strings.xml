@@ -24,6 +24,8 @@
     <string name="inbox">Inbox</string>
     <string name="id_param_name">ID</string>
     <string name="quantity_param_name">Quantity</string>
+    <string name="min_order_param_name">MinQuantityPerOrder</string>
+    <string name="requested_param_name">OrderedQuantity</string>
     <string name="hot_buys">Hot Buys</string>
     <string name="HOT_BUYS">HOT BUYS</string>
     <string name="MESSAGES">MESSAGES</string>

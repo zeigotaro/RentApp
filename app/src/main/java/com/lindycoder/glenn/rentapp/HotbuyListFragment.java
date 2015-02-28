@@ -119,7 +119,8 @@ public class HotbuyListFragment extends android.support.v4.app.ListFragment {
 
             productMap = ((AccountMainActivity) getActivity()).getProductMap();
             // looping through All products
-            if(!productMap.isEmpty())
+
+            if((productMap != null) && !productMap.isEmpty())
             {
                 for (Map.Entry<Integer, Product> entry : productMap.entrySet()) {
                     Product p = entry.getValue();

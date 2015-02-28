@@ -35,7 +35,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class HotbuyFragment extends Fragment {
@@ -98,7 +100,10 @@ public class HotbuyFragment extends Fragment {
             holder.txtName = (TextView) rootView.findViewById(R.id.name_space);
             holder.txtPrice = (TextView) rootView.findViewById(R.id.price_space);
             holder.txtDescription = (TextView) rootView.findViewById(R.id.item_description);
+            holder.txtMinOrder = (TextView) rootView.findViewById(R.id.amount_required_space);
             holder.txtExpirationTime = (TextView) rootView.findViewById(R.id.offer_time_space);
+            holder.txtRequested = (TextView) rootView.findViewById(R.id.requested_space);
+            holder.txtAvailable = (TextView) rootView.findViewById(R.id.available_space);
             holder.btnOrderNow = (Button) rootView.findViewById(R.id.order_button);
             rootView.setTag(holder);
         }
@@ -112,8 +117,14 @@ public class HotbuyFragment extends Fragment {
             holder.txtName.setText(productName);
             holder.txtPrice.setText(price);
             holder.txtExpirationTime.setText(product.getTimeRemainingString(getString(R.string.sold_out)));
+            holder.txtMinOrder.setText(getString(R.string.amount_required) + " " + product.getMinOrder());
+            holder.txtAvailable.setText(getString(R.string.available) + " " + product.getRemaining());
+            holder.txtRequested.setText(getString(R.string.requested) + " " + product.getOrdered());
+
             apiToken = ((AccountMainActivity) getActivity()).getAPIToken();
-            new UserGetIndividualProduct(apiToken, product.getId(),holder.txtDescription).execute();
+            HashMap <String, TextView> map = new HashMap<>();
+            map.put(getString(R.string.description_param_name), holder.txtDescription);
+            new UserGetIndividualProduct(apiToken, product.getId(),map).execute();
             rootView.setFocusableInTouchMode(true);
             rootView.requestFocus();
             rootView.setOnKeyListener(new View.OnKeyListener() {
@@ -139,7 +150,18 @@ public class HotbuyFragment extends Fragment {
                             currentUnitAmount = Integer.parseInt(amount);
                             quantityString = getString(R.string.quantity) + " " + amount;
                             Log.i("EDIT_TEXT", "done action, int: " + Integer.toString(currentUnitAmount));
+                            HotbuyFragment.getCurrentInstance().updateMinWarning();
                         }
+                    }
+                    return false;
+                }
+            });
+
+            edittext.setOnKeyListener(new View.OnKeyListener() {
+                public boolean onKey(View v, int actionId, KeyEvent event) {
+                    if(actionId == KeyEvent.KEYCODE_BACK) {
+                        ((AccountMainActivity) getActivity()).changeToFragment(FragmentId.HOTBUYS);
+                        return true;
                     }
                     return false;
                 }
@@ -174,6 +196,17 @@ public class HotbuyFragment extends Fragment {
         return rootView;
     }
 
+    public void updateMinWarning() {
+        if(rootView != null) {
+            final TextView minWarning = (TextView) rootView.findViewById(R.id.minimum_not_reached_space);
+            if(currentUnitAmount >= product.getMinOrder()) {
+                minWarning.setText("");
+            } else {
+               minWarning.setText(getString(R.string.minimum_not_reached));
+            }
+        }
+    }
+
         /*
         loadBitmap(R.drawable.hotbuys, (ImageView) rootView.findViewById(R.id.hotbuy_space), FragmentId.HOTBUYS);
         loadBitmap(R.drawable.messages, (ImageView) rootView.findViewById(R.id.message_space), FragmentId.MESSAGES);
@@ -185,6 +218,9 @@ public class HotbuyFragment extends Fragment {
         TextView txtPrice;
         TextView txtDescription;
         TextView txtExpirationTime;
+        TextView txtMinOrder;
+        TextView txtAvailable;
+        TextView txtRequested;
         ImageView imgPreview;
         Button btnOrderNow;
     }
@@ -195,14 +231,17 @@ public class HotbuyFragment extends Fragment {
      */
     public class UserGetIndividualProduct extends AsyncTask<Void, Void, Boolean> {
 
-        private final WeakReference<TextView> textViewReference;
+        private HashMap<WeakReference<TextView>, String> weakMap;
         private final String mApiToken;
         private final int mId;
-        private String description;
 
-        UserGetIndividualProduct (String apiToken, int id, TextView view) {
-            // Use a WeakReference to ensure the textView can be garbage collected
-            textViewReference = new WeakReference<>(view);
+        UserGetIndividualProduct (String apiToken, int id, HashMap<String, TextView> map) {
+            // Use a WeakReferences to ensure the textView can be garbage collected
+            weakMap = new HashMap<>();
+            for (Map.Entry<String, TextView> entry : map.entrySet()) {
+                WeakReference<TextView> viewReference = new WeakReference<>(entry.getValue());
+                weakMap.put(viewReference, entry.getKey()); //Yes, this is correct, the key/value is flipped for weakMap
+            }
             mApiToken = apiToken;
             mId = id;
         }
@@ -219,7 +258,17 @@ public class HotbuyFragment extends Fragment {
                 if(jProduct != null) {
                     Log.i("PRODUCT_DETAIL", jProduct.toString());
                     try {
-                        description = jProduct.getString(getString(R.string.description_param_name));
+                        for (Map.Entry<WeakReference<TextView>, String> entry : weakMap.entrySet()) {
+                            String oldValue = entry.getValue();
+                            String resultText;
+                            if(jProduct.isNull(oldValue)) {
+                                resultText = "0";
+                            } else {
+                                resultText = jProduct.getString(oldValue);
+                            }
+
+                            entry.setValue(getPrefixText(oldValue) + resultText);
+                        }
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -229,13 +278,24 @@ public class HotbuyFragment extends Fragment {
         }
 
         protected void onPostExecute(Boolean b) {
-            if (textViewReference != null) {
-                final TextView textView = textViewReference.get();
+            for (Map.Entry<WeakReference<TextView>, String> entry : weakMap.entrySet()) {
+                final TextView textView = entry.getKey().get();
                 if (textView != null) {
-                    textView.setText(description);
+                    textView.setText(entry.getValue());
                 }
             }
         }
+
+    }
+
+    private String getPrefixText(String paramName) {
+        String retString = "";
+        if(paramName.equals(getString(R.string.min_order_param_name))) {
+            retString = getString(R.string.amount_required) + " ";
+        } else if(paramName.equals(getString(R.string.requested_param_name))) {
+            retString = getString(R.string.requested) + " ";
+        }
+        return retString;
     }
 
     public class UserPostItemBuy extends AsyncTask<Void, Void, Boolean> {

@@ -101,6 +101,14 @@ public class Product {
         return(quantity - ordered);
     }
 
+    public int getOrdered() {
+        return ordered;
+    }
+
+    public int getMinOrder() {
+        return minPurchaseQuantity;
+    }
+
     public int getId() {
         return id;
     }
