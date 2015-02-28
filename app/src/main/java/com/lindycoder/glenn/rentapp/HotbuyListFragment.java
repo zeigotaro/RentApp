@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -21,10 +20,6 @@ import android.widget.TextView;
 
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -91,10 +86,9 @@ public class HotbuyListFragment extends android.support.v4.app.ListFragment {
     /**
      * Background Async Task to Load all Products
      */
-    private class LoadList extends AsyncTask<String, String, String> {
+    private class LoadList extends AsyncTask<Void, Void, Boolean> {
 
         private final WeakReference<ListView> listViewReference;
-        private Context mContext;
         // products map
         private HashMap<Integer, Product> productMap = null;
 
@@ -106,8 +100,8 @@ public class HotbuyListFragment extends android.support.v4.app.ListFragment {
         /**
          * getting Products JSON
          */
-        protected String doInBackground(String... args) {
-
+        @Override
+        protected Boolean doInBackground(Void... params) {
             productMap = ((AccountMainActivity) getActivity()).getProductMap();
             // looping through All products
 
@@ -130,42 +124,48 @@ public class HotbuyListFragment extends android.support.v4.app.ListFragment {
                         hotbuyList.add(map);
                     }
                 }
+            } else {
+                return false;
             }
 
-            return null;
+            return true;
         }
 
         @Override
-        protected void onPostExecute(String string) {
-            getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-                    /**
-                     * Updating parsed JSON data into ListView
-                     * */
-                    ListAdapter adapter = new ImageSimpleAdapter(
-                            getActivity(),
-                            hotbuyList,
-                            R.layout.hotbuy_list_item,
-                            new String[] { TAG_NAME, TAG_CATEGORY, TAG_QUANTITY, TAG_PRICE, TAG_IMG},
-                            new int[] { R.id.hotbuy_item_title, R.id.hotbuy_item_category, R.id.hotbuy_item_quantity, R.id.hotbuy_item_price, R.id.hotbuy_img_preview },
-                            options
-                    );
-                    // updating listview
-                    setListAdapter(adapter);
-                }
-            });
-            if (listViewReference != null) {
-                final ListView listView = listViewReference.get();
-                if (listView != null) {
-                    listView.setDivider(new ColorDrawable(Color.RED));
-                    listView.setDividerHeight(2);
-                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            HashMap<String, String> itemMap = (HashMap<String, String>)listView.getItemAtPosition(position);
-                            ((AccountMainActivity) getActivity()).productItemSelected(Integer.parseInt(itemMap.get(TAG_ID)));
+        protected void onPostExecute(Boolean fillSuccess) {
+            if(fillSuccess) {
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        /**
+                         * Updating parsed JSON data into ListView
+                         * */
+                        ListAdapter adapter = new ImageSimpleAdapter(
+                                getActivity(),
+                                hotbuyList,
+                                R.layout.hotbuy_list_item,
+                                new String[] { TAG_NAME, TAG_CATEGORY, TAG_QUANTITY, TAG_PRICE, TAG_IMG},
+                                new int[] { R.id.hotbuy_item_title, R.id.hotbuy_item_category, R.id.hotbuy_item_quantity, R.id.hotbuy_item_price, R.id.hotbuy_img_preview },
+                                options
+                        );
+                        // updating listview
+                        setListAdapter(adapter);
+                    }
+                });
+                if (listViewReference != null) {
+                    final ListView listView = listViewReference.get();
+                    if (listView != null) {
+                        listView.setDivider(new ColorDrawable(Color.RED));
+                        listView.setDividerHeight(2);
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                HashMap<String, String> itemMap = (HashMap<String, String>)listView.getItemAtPosition(position);
+                                ((AccountMainActivity) getActivity()).productItemSelected(Integer.parseInt(itemMap.get(TAG_ID)));
                         }
-                    });
+                        });
+                    }
                 }
+            } else {
+                ((AccountMainActivity)getActivity()).showErrorLogoutDialog();
             }
         }
     }

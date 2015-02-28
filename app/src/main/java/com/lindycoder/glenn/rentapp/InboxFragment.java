@@ -76,7 +76,7 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
     /**
      * Background Async Task to Load all INBOX messages
      */
-    private class LoadInbox extends AsyncTask<String, String, String> {
+    private class LoadInbox extends AsyncTask<String, String, Boolean> {
         private final WeakReference<ListView> listViewReference;
 
         private Context mContext;
@@ -89,78 +89,85 @@ public class InboxFragment extends android.support.v4.app.ListFragment {
         /**
          * getting Inbox JSON
          */
-        protected String doInBackground(String... args) {
+        protected Boolean doInBackground(String... args) {
 
             try {
                 inbox = ((AccountMainActivity) getActivity()).getMessages();
+                if(inbox != null) {
                 // looping through All messages
-                for (int i = 0; i < inbox.length(); i++) {
-                    JSONObject c = inbox.getJSONObject(i);
+                    for (int i = 0; i < inbox.length(); i++) {
+                        JSONObject c = inbox.getJSONObject(i);
 
-                    // Storing each json item in variable
-                    String id = c.getString(TAG_ID);
-                    String sender = c.getString(TAG_SENDER);
-                    String title = c.getString(TAG_TITLE);
-                    String text = c.getString(TAG_TEXT);
-                    JSONObject d = c.getJSONObject(TAG_DATE_ADDED);
-                    String date = d.getString(TAG_DATE);
-                    String parsed_date = parseDate(date, "UTC");
+                        // Storing each json item in variable
+                        String id = c.getString(TAG_ID);
+                        String sender = c.getString(TAG_SENDER);
+                        String title = c.getString(TAG_TITLE);
+                        String text = c.getString(TAG_TEXT);
+                        JSONObject d = c.getJSONObject(TAG_DATE_ADDED);
+                        String date = d.getString(TAG_DATE);
+                        String parsed_date = parseDate(date, "UTC");
 
-                    // creating new HashMap
-                    HashMap<String, String> map = new HashMap<>();
+                        // creating new HashMap
+                        HashMap<String, String> map = new HashMap<>();
 
-                    // adding each child node to HashMap key => value
-                    map.put(TAG_ID, id);
-                    map.put(TAG_SENDER, sender);
-                    map.put(TAG_TITLE, title);
-                    map.put(TAG_TEXT, text);
-                    map.put(TAG_DATE, parsed_date);
+                        // adding each child node to HashMap key => value
+                        map.put(TAG_ID, id);
+                        map.put(TAG_SENDER, sender);
+                        map.put(TAG_TITLE, title);
+                        map.put(TAG_TEXT, text);
+                        map.put(TAG_DATE, parsed_date);
 
-                    // adding HashList to ArrayList
-                    inboxList.add(map);
+                        // adding HashList to ArrayList
+                        inboxList.add(map);
+                    }
+                } else {
+                    return false;
                 }
-
             } catch (JSONException e) {
                 e.printStackTrace();
             }
 
-            return null;
+            return true;
         }
 
         @Override
-        protected void onPostExecute(String string) {
-            getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-                    /**
-                     * Updating parsed JSON data into ListView
-                     * */
-                    ListAdapter adapter = new SimpleAdapter(
-                            getActivity(),
-                            inboxList,
-                            R.layout.inbox_list_item,
-                            new String[] { TAG_SENDER, TAG_TITLE, TAG_DATE, TAG_TEXT },
-                            new int[] { R.id.from, R.id.subject, R.id.date, R.id.text });
-                    // updating listview
-                    setListAdapter(adapter);
-                }
-            });
+        protected void onPostExecute(Boolean listSuccess) {
+            if(listSuccess) {
+                getActivity().runOnUiThread(new Runnable() {
+                    public void run() {
+                        /**
+                         * Updating parsed JSON data into ListView
+                         * */
+                        ListAdapter adapter = new SimpleAdapter(
+                                getActivity(),
+                                inboxList,
+                                R.layout.inbox_list_item,
+                                new String[] { TAG_SENDER, TAG_TITLE, TAG_DATE, TAG_TEXT },
+                                new int[] { R.id.from, R.id.subject, R.id.date, R.id.text });
+                        // updating listview
+                        setListAdapter(adapter);
+                    }
+                });
 
-            if (listViewReference != null) {
-                final ListView listView = listViewReference.get();
-                if (listView != null) {
-                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                            HashMap<String, String> itemMap = (HashMap<String, String>)listView.getItemAtPosition(position);
-                            new AlertDialog.Builder(getActivity(), AlertDialog.THEME_HOLO_LIGHT)
-                                    .setTitle(itemMap.get(TAG_TITLE))
-                                    .setMessage(itemMap.get(TAG_TEXT))
-                                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-                                        public void onClick(DialogInterface dialog, int which) {
-                                        }
-                                    })
-                                    .show();
+                if (listViewReference != null) {
+                    final ListView listView = listViewReference.get();
+                    if (listView != null) {
+                        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                                                            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                                HashMap<String, String> itemMap = (HashMap<String, String>)listView.getItemAtPosition(position);
+                                new AlertDialog.Builder(getActivity(), AlertDialog.THEME_HOLO_LIGHT)
+                                        .setTitle(itemMap.get(TAG_TITLE))
+                                        .setMessage(itemMap.get(TAG_TEXT))
+                                        .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                            public void onClick(DialogInterface dialog, int which) {
+                                            }
+                                        })
+                                        .show();
                         }
-                    });
+                        });
+                    }
+                } else {
+                    ((AccountMainActivity)getActivity()).showErrorLogoutDialog();
                 }
             }
         }

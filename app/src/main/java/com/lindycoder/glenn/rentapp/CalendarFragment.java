@@ -43,16 +43,21 @@ public class CalendarFragment extends Fragment {
 
         // products JSONArray
         JSONArray eventArray = ((AccountMainActivity) getActivity()).getEvents();
-        HashMap<Integer, HashMap<Integer, Event>> monthEventMap = parseArrayToMap(eventArray);
+        if(eventArray != null) {
+            HashMap<Integer, HashMap<Integer, Event>> monthEventMap = parseArrayToMap(eventArray);
 
-        ((AccountMainActivity) getActivity()).setActionBarTitle(getString(R.string.calendar));
-        Calendar c = Calendar.getInstance();
-        EventCalendarView calendar = (EventCalendarView) rootView.findViewById(R.id.calendar_view);
+            ((AccountMainActivity) getActivity()).setActionBarTitle(getString(R.string.calendar));
+            Calendar c = Calendar.getInstance();
+            EventCalendarView calendar = (EventCalendarView) rootView.findViewById(R.id.calendar_view);
 
-        calendar.setMonthEventMap(monthEventMap);
-        calendar.refreshCalendar();
+            calendar.setMonthEventMap(monthEventMap);
+            calendar.refreshCalendar();
 
-        return rootView;
+            return rootView;
+        } else {
+            ((AccountMainActivity)getActivity()).showErrorLogoutDialog();
+            return null;
+        }
     }
 
     @Override

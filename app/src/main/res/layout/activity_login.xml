@@ -10,14 +10,6 @@
     android:background="@android:color/white"
     tools:context="com.lindycoder.glenn.helloworld.LoginActivity">
 
-    <!-- Login progress -->
-    <ProgressBar android:id="@+id/login_progress"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:visibility="gone" />
-
     <ImageView
         android:layout_width="150dp"
         android:layout_height="50dp"
@@ -71,7 +63,8 @@
                 android:layout_gravity="center"
                 android:text="@string/action_login"
                 android:textStyle="bold"
-                android:background="@android:color/darker_gray"/>
+                android:textColor="@android:color/white"
+                android:background="#FF0000"/>
 
         </LinearLayout>
     </ScrollView>

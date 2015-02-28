@@ -1,6 +1,8 @@
 package com.lindycoder.glenn.rentapp;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -252,11 +254,19 @@ public class AccountMainActivity extends ActionBarActivity
     }
 
     public JSONArray getEvents() {
-        return mListMap.get(getString(R.string.events));
+        if((mListMap == null) || (mListMap.isEmpty())) {
+            return null;
+        } else {
+            return mListMap.get(getString(R.string.events));
+        }
     }
 
     public JSONArray getMessages() {
-        return mListMap.get(getString(R.string.messages));
+        if((mListMap == null) || (mListMap.isEmpty())) {
+            return null;
+        } else {
+            return mListMap.get(getString(R.string.messages));
+        }
     }
 
     public HashMap<Integer, Product> getProductMap() {
@@ -272,6 +282,17 @@ public class AccountMainActivity extends ActionBarActivity
     public void onOrderSuccess() {
         getListsTask = new UserGetListsTask();
         getListsTask.execute((Void) null);
+    }
+
+    public void showErrorLogoutDialog() {
+        new AlertDialog.Builder(this, AlertDialog.THEME_HOLO_LIGHT)
+                .setTitle(getString(R.string.post_error))
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        changeToFragment(FragmentId.LOGOUT);
+                    }
+                })
+                .show();
     }
 
     @Override
@@ -335,7 +356,9 @@ public class AccountMainActivity extends ActionBarActivity
             map.put(getString(R.string.events), getString(R.string.http_event_post_url));
 
             for(HashMap.Entry<String, String> entry : map.entrySet()) {
-                fillList(entry.getValue(), entry.getKey());
+                if(fillList(entry.getValue(), entry.getKey()) == false) { //fillList POST failed
+                    return false;
+                }
             }
             mLastUpdated = new Date();
             parseToObjectLists();
@@ -343,8 +366,7 @@ public class AccountMainActivity extends ActionBarActivity
             return true;
         }
 
-        private int fillList(String post_url, String param_name) {
-            int retCount = 0;
+        private boolean fillList(String post_url, String param_name) {
             // Building post parameters, key and value pair
             List<NameValuePair> nameValuePair = new ArrayList<NameValuePair>(1);
             nameValuePair.add(new BasicNameValuePair(getString(R.string.token_param_name), mApiToken));
@@ -359,15 +381,16 @@ public class AccountMainActivity extends ActionBarActivity
                     if ((resultCode != null) && resultCode.equals(getString(R.string.post_success))) {
                         JSONArray jArray = result.getJSONArray(param_name);
                         if(jArray != null) {
-                            retCount = jArray.length();
                             mListMap.put(param_name, jArray);
                         }
+                    } else {
+                        return false;
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
-            return retCount;
+            return true;
         }
 
         private void parseToObjectLists() {
@@ -378,8 +401,12 @@ public class AccountMainActivity extends ActionBarActivity
         }
 
         @Override
-        protected void onPostExecute(Boolean b) {
-            changeToFragment(FragmentId.HOME);
+        protected void onPostExecute(Boolean postSuccess) {
+            if(postSuccess) {
+                changeToFragment(FragmentId.HOME);
+            } else {
+                showErrorLogoutDialog();
+            }
         }
 
     }
