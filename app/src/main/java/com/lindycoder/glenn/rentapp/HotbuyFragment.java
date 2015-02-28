@@ -89,7 +89,7 @@ public class HotbuyFragment extends Fragment {
                 .setTitle(result)
                 .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int which) {
-                        ((AccountMainActivity)getActivity()).changeToFragment(FragmentId.HOTBUYS);
+                        ((AccountMainActivity)getActivity()).onOrderSuccess();
                     }
                 })
                 .show();

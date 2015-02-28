@@ -6,49 +6,29 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
-import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.content.Context;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.support.v4.widget.DrawerLayout;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
-import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.TimeZone;
 
 
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
@@ -74,7 +54,7 @@ public class AccountMainActivity extends ActionBarActivity
     private HashMap<Integer, Product> mProductMap = null;
     private Date mLastUpdated = null;
 
-    private UserGetObjectCountsTask mCountTask = null;
+    private UserGetListsTask getListsTask = null;
 
     private ActionBar mActionBar = null;
     private final FragmentId[] myFragmentIdValues = FragmentId.values();
@@ -121,8 +101,8 @@ public class AccountMainActivity extends ActionBarActivity
         // Get the message from the intent
         Intent intent = getIntent();
         mApiToken = intent.getStringExtra(LoginActivity.API_TOKEN);
-        mCountTask = new UserGetObjectCountsTask();
-        mCountTask.execute((Void) null);
+        getListsTask = new UserGetListsTask();
+        getListsTask.execute((Void) null);
 
         options = new DisplayImageOptions.Builder()
                 .showImageForEmptyUri(android.R.drawable.alert_light_frame)
@@ -289,6 +269,11 @@ public class AccountMainActivity extends ActionBarActivity
         changeToFragment(FragmentId.HOTBUY_ITEM);
     }
 
+    public void onOrderSuccess() {
+        getListsTask = new UserGetListsTask();
+        getListsTask.execute((Void) null);
+    }
+
     @Override
     public void onBackPressed() {
         if(currentFragment != FragmentId.HOME)
@@ -339,9 +324,9 @@ public class AccountMainActivity extends ActionBarActivity
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    public class UserGetObjectCountsTask extends AsyncTask<Void, Void, Boolean> {
+    public class UserGetListsTask extends AsyncTask<Void, Void, Boolean> {
 
-        UserGetObjectCountsTask() { }
+        UserGetListsTask() { }
         @Override
         protected Boolean doInBackground(Void... params) {
             HashMap<String, String> map = new HashMap<>();
@@ -391,6 +376,12 @@ public class AccountMainActivity extends ActionBarActivity
                 mProductMap = ParseUtils.parseProductMapFromJSON(j);
             }
         }
+
+        @Override
+        protected void onPostExecute(Boolean b) {
+            changeToFragment(FragmentId.HOME);
+        }
+
     }
 
 }
