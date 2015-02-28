@@ -2,6 +2,7 @@ package com.lindycoder.glenn.rentapp;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -51,6 +52,7 @@ import java.util.TimeZone;
 
 
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
@@ -79,6 +81,7 @@ public class AccountMainActivity extends ActionBarActivity
     private String mApiToken;
     private int mCurrentItemId;
     private FragmentId currentFragment = FragmentId.LOGOUT;
+    private DisplayImageOptions options;
     public final static String LOGOUT_TOKEN = "com.lindycoder.glenn.rentapp.LOGOUT";
 
 
@@ -120,6 +123,16 @@ public class AccountMainActivity extends ActionBarActivity
         mApiToken = intent.getStringExtra(LoginActivity.API_TOKEN);
         mCountTask = new UserGetObjectCountsTask();
         mCountTask.execute((Void) null);
+
+        options = new DisplayImageOptions.Builder()
+                .showImageForEmptyUri(android.R.drawable.alert_light_frame)
+                .showImageOnFail(android.R.drawable.alert_light_frame)
+                .resetViewBeforeLoading(true)
+                .cacheInMemory(true)
+                .cacheOnDisk(true)
+                .considerExifParams(true)
+                .bitmapConfig(Bitmap.Config.RGB_565)
+                .build();
     }
 
     @Override
@@ -246,10 +259,10 @@ public class AccountMainActivity extends ActionBarActivity
         currentFragment = fragmentId;
         switch (fragmentId) {
             case HOME:       return HomeFragment.newInstance();
-            case HOTBUYS:    return HotbuyListFragment.newInstance();
+            case HOTBUYS:    return HotbuyListFragment.newInstance(options);
             case MESSAGES:   return InboxFragment.newInstance();
             case EVENTS:     return CalendarFragment.newInstance();
-            case HOTBUY_ITEM:     return HotbuyFragment.newInstance(mProductMap.get(mCurrentItemId));
+            case HOTBUY_ITEM:     return HotbuyFragment.newInstance(mProductMap.get(mCurrentItemId), options);
             default:         return PlaceholderFragment.newInstance(fragmentId.getValue());
         }
     }

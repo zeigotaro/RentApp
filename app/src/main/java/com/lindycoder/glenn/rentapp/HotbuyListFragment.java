@@ -39,7 +39,7 @@ public class HotbuyListFragment extends android.support.v4.app.ListFragment {
 
     private static final FragmentId fragmentId = FragmentId.HOTBUYS;
     ArrayList<HashMap<String, String>> hotbuyList;
-    DisplayImageOptions options;
+    private static DisplayImageOptions options;
 
     // ALL JSON node names
     private static final String TAG_ID = "ID";
@@ -55,8 +55,9 @@ public class HotbuyListFragment extends android.support.v4.app.ListFragment {
     private static final String TAG_TIMEZONE_TYPE= "timezone_type";
     private static final String TAG_TIMEZONE= "timezone";
 
-    public static HotbuyListFragment newInstance() {
+    public static HotbuyListFragment newInstance(DisplayImageOptions opts) {
         HotbuyListFragment fragment = new HotbuyListFragment();
+        options = opts;
         return fragment;
     }
 
@@ -66,16 +67,6 @@ public class HotbuyListFragment extends android.support.v4.app.ListFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        options = new DisplayImageOptions.Builder()
-                .showImageForEmptyUri(android.R.drawable.alert_light_frame)
-                .showImageOnFail(android.R.drawable.alert_light_frame)
-                .resetViewBeforeLoading(true)
-                .cacheInMemory(true)
-                .cacheOnDisk(true)
-                .considerExifParams(true)
-                .bitmapConfig(Bitmap.Config.RGB_565)
-                .build();
     }
 
     @Override

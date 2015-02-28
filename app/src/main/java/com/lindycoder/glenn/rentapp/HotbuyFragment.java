@@ -20,6 +20,9 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -51,11 +54,13 @@ public class HotbuyFragment extends Fragment {
     private View rootView;
     private int currentUnitAmount = 0;
     private static HotbuyFragment currentInstance = null;
+    private static DisplayImageOptions options;
 
-    public static HotbuyFragment newInstance(Product p) {
+    public static HotbuyFragment newInstance(Product p, DisplayImageOptions opts) {
         HotbuyFragment fragment = new HotbuyFragment();
         product = p;
         currentInstance = fragment;
+        options = opts;
         return fragment;
     }
 
@@ -104,6 +109,7 @@ public class HotbuyFragment extends Fragment {
             holder.txtExpirationTime = (TextView) rootView.findViewById(R.id.offer_time_space);
             holder.txtRequested = (TextView) rootView.findViewById(R.id.requested_space);
             holder.txtAvailable = (TextView) rootView.findViewById(R.id.available_space);
+            holder.imgPreview = (ImageView) rootView.findViewById(R.id.image_space);
             holder.btnOrderNow = (Button) rootView.findViewById(R.id.order_button);
             rootView.setTag(holder);
         }
@@ -120,6 +126,7 @@ public class HotbuyFragment extends Fragment {
             holder.txtMinOrder.setText(getString(R.string.amount_required) + " " + product.getMinOrder());
             holder.txtAvailable.setText(getString(R.string.available) + " " + product.getRemaining());
             holder.txtRequested.setText(getString(R.string.requested) + " " + product.getOrdered());
+            ImageLoader.getInstance().displayImage(product.getPreviewUrl(), holder.imgPreview, options);
 
             apiToken = ((AccountMainActivity) getActivity()).getAPIToken();
             HashMap <String, TextView> map = new HashMap<>();
